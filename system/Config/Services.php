@@ -384,7 +384,7 @@ class Services extends BaseService
     /**
      * The Mailer class sends emails from any of the available protocol handlers.
      *
-     * @param MailerConfig|null $config
+     * @param Mailer|null $config
      * @param boolean $getShared
      *
      * @return MailerInterface
