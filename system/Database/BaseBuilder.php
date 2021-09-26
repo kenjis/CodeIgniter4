@@ -2620,18 +2620,18 @@ class BaseBuilder
                 ? '\s+' . preg_quote(trim(sprintf($this->db->likeEscapeStr, $this->db->likeEscapeChar)), '/')
                 : '';
             $_operators = [
-                '\s*(?:<|>|!)?=\s*', // =, <=, >=, !=
-                '\s*<>?\s*', // <, <>
-                '\s*>\s*', // >
-                '\s+IS NULL', // IS NULL
-                '\s+IS NOT NULL', // IS NOT NULL
-                '\s+EXISTS\s*\(.*\)', // EXISTS(sql)
-                '\s+NOT EXISTS\s*\(.*\)', // NOT EXISTS(sql)
-                '\s+BETWEEN\s+', // BETWEEN value AND value
-                '\s+IN\s*\(.*\)', // IN(list)
-                '\s+NOT IN\s*\(.*\)', // NOT IN (list)
-                '\s+LIKE\s+\S.*(' . $_les . ')?', // LIKE 'expr'[ ESCAPE '%s']
-                '\s+NOT LIKE\s+\S.*(' . $_les . ')?', // NOT LIKE 'expr'[ ESCAPE '%s']
+                '\s*(?:<|>|!)?=\s*',                    // =, <=, >=, !=
+                '\s*<>?\s*',                            // <, <>
+                '\s*>\s*',                              // >
+                '\s+IS NULL',                           // IS NULL
+                '\s+IS NOT NULL',                       // IS NOT NULL
+                '\s+EXISTS\s*\(.*\)',                   // EXISTS(sql)
+                '\s+NOT EXISTS\s*\(.*\)',               // NOT EXISTS(sql)
+                '\s+BETWEEN\s+',                        // BETWEEN value AND value
+                '\s+IN\s*\(.*\)',                       // IN(list)
+                '\s+NOT IN\s*\(.*\)',                   // NOT IN (list)
+                '\s+LIKE\s+\S.*(' . $_les . ')?',       // LIKE 'expr'[ ESCAPE '%s']
+                '\s+NOT LIKE\s+\S.*(' . $_les . ')?',   // NOT LIKE 'expr'[ ESCAPE '%s']
             ];
         }
 
