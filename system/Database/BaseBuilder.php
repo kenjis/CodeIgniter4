@@ -2635,7 +2635,12 @@ class BaseBuilder
             ];
         }
 
-        return preg_match_all('/' . implode('|', $_operators) . '/i', $str, $match) ? ($list ? $match[0] : $match[0][0]) : false;
+        $pattern = '/' . implode('|', $_operators) . '/i';
+        if (preg_match_all($pattern, $str, $matche) < 1) {
+            return false;
+        }
+
+        return $list ? $matche[0] : $matche[0][0];
     }
 
     /**
