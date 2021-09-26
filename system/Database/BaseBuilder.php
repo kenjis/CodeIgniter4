@@ -2347,9 +2347,13 @@ class BaseBuilder
                 );
 
                 foreach ($conditions as &$condition) {
-                    if (($op = $this->getOperator($condition)) === false
-                        || ! preg_match('/^(\(?)(.*)(' . preg_quote($op, '/') . ')\s*(.*(?<!\)))?(\)?)$/i', $condition, $matches)
-                    ) {
+                    $op = $this->getOperator($condition);
+                    if ($op === false) {
+                        continue;
+                    }
+
+                    $pattern = '/^(\(?)(.*)(' . preg_quote($op, '/') . ')\s*(.*(?<!\)))?(\)?)$/i';
+                    if (! preg_match($pattern, $condition, $matches)) {
                         continue;
                     }
                     // $matches = array(
