@@ -673,7 +673,7 @@ class BaseBuilder
 
                 if ($v instanceof Closure) {
                     $builder = $this->cleanClone();
-                    $v       = '(' . str_replace("\n", ' ', $v($builder)->getCompiledSelect()) . ')';
+                    $v       = ' (' . str_replace("\n", ' ', $v($builder)->getCompiledSelect()) . ')';
                 } else {
                     $v = " :{$bind}:";
                 }
@@ -2352,34 +2352,47 @@ class BaseBuilder
                         continue;
                     }
 
-                    $pattern = '/^(\(?)(.*)(' . preg_quote($op, '/') . ')\s*(.*(?<!\)))?(\)?)$/i';
+                    $pattern = '/^(\(?)(.*)(' . preg_quote(trim($op), '/') . ')\s*(\(?)(.*(?<!\)))?(\)?)(\(?)$/';
                     if (! preg_match($pattern, $condition, $matches)) {
                         continue;
                     }
-                    // $matches = array(
-                    //	0 => '(test <= foo)',	/* the whole thing */
-                    //	1 => '(',		/* optional */
-                    //	2 => 'test',		/* the field name */
-                    //	3 => ' <= ',		/* $op */
-                    //	4 => 'foo',		/* optional, if $op is e.g. 'IS NULL' */
-                    //	5 => ')'		/* optional */
-                    // );
+                    // @see https://regex101.com/r/pFEq8N/1
+                    // $matches = [
+                    //    0 => '(test < foo)',  /* the whole thing */
+                    //    1 => '(',             /* optional */
+                    //    2 => 'test',          /* the field name */
+                    //    3 => '<',             /* operator */
+                    //    4 => '',              /* optional */
+                    //    5 => 'foo',           /* optional, if $op is e.g. 'IS NULL' */
+                    //    6 => ')',             /* optional */
+                    //    7 => '',              /* optional */
+                    // ];
 
-                    if (! empty($matches[4])) {
+                    // @see https://regex101.com/r/pwVmcM/1
+                    // $matches = [
+                    //    0 => 'advance_amount < (SELECT MAX(advance_amount) FROM "orders" WHERE "id" > 2)', /* the whole thing */
+                    //    1 => '',                /* optional */
+                    //    2 => 'advance_amount',  /* the field name */
+                    //    3 => '<',               /* operator */
+                    //    4 => '(',               /* optional */
+                    //    5 => 'SELECT MAX(advance_amount) FROM "orders" WHERE "id" >2',
+                    //    6 => ')',               /* optional */
+                    //    7 => '',                /* optional */
+                    // ];
+
+                    if (! empty($matches[5])) {
                         $protectIdentifiers = false;
-                        if (strpos($matches[4], '.') !== false) {
+                        if (strpos($matches[5], '.') !== false) {
                             $protectIdentifiers = true;
                         }
 
-                        if (strpos($matches[4], ':') === false) {
-                            $matches[4] = $this->db->protectIdentifiers(trim($matches[4]), false, $protectIdentifiers);
+                        if (strpos($matches[5], ':') === false) {
+                            $matches[5] = $this->db->protectIdentifiers(trim($matches[5]), false, $protectIdentifiers);
                         }
-
-                        $matches[4] = ' ' . $matches[4];
                     }
 
                     $condition = $matches[1] . $this->db->protectIdentifiers(trim($matches[2]))
-                        . ' ' . trim($matches[3]) . $matches[4] . $matches[5];
+                        . $op . $matches[4] . $matches[5] . $matches[6] . $matches[7];
                 }
 
                 $qbkey = implode('', $conditions);
@@ -2638,6 +2651,25 @@ class BaseBuilder
         $pattern = '/' . implode('|', $_operators) . '/i';
         if (preg_match_all($pattern, $str, $matches) < 1) {
             return false;
+        }
+
+        // Adjust the number of spaces before and after.
+        foreach ($matches as &$match) {
+            foreach ($match as &$op) {
+                if ($op === '') {
+                    continue;
+                }
+
+                // Add space before the operator
+                // e.g. " IS NULL"
+                $op = ' ' . trim($op);
+
+                if (preg_match('/[<>=]/', $op) > 0) {
+                    // Add space after the operator
+                    // e.g. " < ", " > ", " = "
+                    $op = $op . ' ';
+                }
+            }
         }
 
         return $list ? $matches[0] : $matches[0][0];
