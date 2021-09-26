@@ -2325,84 +2325,84 @@ class BaseBuilder
      */
     protected function compileWhereHaving(string $qbKey): string
     {
-        if (! empty($this->{$qbKey})) {
-            foreach ($this->{$qbKey} as &$qbkey) {
-                // Is this condition already compiled?
-                if (is_string($qbkey)) {
-                    continue;
-                }
-
-                if ($qbkey['escape'] === false) {
-                    $qbkey = $qbkey['condition'];
-
-                    continue;
-                }
-
-                // Split multiple conditions
-                $conditions = preg_split(
-                    '/((?:^|\s+)AND\s+|(?:^|\s+)OR\s+)/i',
-                    $qbkey['condition'],
-                    -1,
-                    PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
-                );
-
-                foreach ($conditions as &$condition) {
-                    $op = $this->getOperator($condition);
-                    if ($op === false) {
-                        continue;
-                    }
-
-                    $pattern = '/^(\(?)(.*)(' . preg_quote(trim($op), '/') . ')\s*(\(?)(.*(?<!\)))?(\)?)(\(?)$/';
-                    if (! preg_match($pattern, $condition, $matches)) {
-                        continue;
-                    }
-                    // @see https://regex101.com/r/pFEq8N/1
-                    // $matches = [
-                    //    0 => '(test < foo)',  /* the whole thing */
-                    //    1 => '(',             /* optional */
-                    //    2 => 'test',          /* the field name */
-                    //    3 => '<',             /* operator */
-                    //    4 => '',              /* optional */
-                    //    5 => 'foo',           /* optional, if $op is e.g. 'IS NULL' */
-                    //    6 => ')',             /* optional */
-                    //    7 => '',              /* optional */
-                    // ];
-
-                    // @see https://regex101.com/r/pwVmcM/1
-                    // $matches = [
-                    //    0 => 'advance_amount < (SELECT MAX(advance_amount) FROM "orders" WHERE "id" > 2)', /* the whole thing */
-                    //    1 => '',                /* optional */
-                    //    2 => 'advance_amount',  /* the field name */
-                    //    3 => '<',               /* operator */
-                    //    4 => '(',               /* optional */
-                    //    5 => 'SELECT MAX(advance_amount) FROM "orders" WHERE "id" >2',
-                    //    6 => ')',               /* optional */
-                    //    7 => '',                /* optional */
-                    // ];
-
-                    if (! empty($matches[5])) {
-                        $protectIdentifiers = false;
-                        if (strpos($matches[5], '.') !== false) {
-                            $protectIdentifiers = true;
-                        }
-
-                        if (strpos($matches[5], ':') === false) {
-                            $matches[5] = $this->db->protectIdentifiers(trim($matches[5]), false, $protectIdentifiers);
-                        }
-                    }
-
-                    $condition = $matches[1] . $this->db->protectIdentifiers(trim($matches[2]))
-                        . $op . $matches[4] . $matches[5] . $matches[6] . $matches[7];
-                }
-
-                $qbkey = implode('', $conditions);
-            }
-
-            return ($qbKey === 'QBHaving' ? "\nHAVING " : "\nWHERE ")
-                . implode("\n", $this->{$qbKey});
+        if (empty($this->{$qbKey})) {
+            return '';
         }
 
-        return '';
+        foreach ($this->{$qbKey} as &$qbkey) {
+            // Is this condition already compiled?
+            if (is_string($qbkey)) {
+                continue;
+            }
+
+            if ($qbkey['escape'] === false) {
+                $qbkey = $qbkey['condition'];
+
+                continue;
+            }
+
+            // Split multiple conditions
+            $conditions = preg_split(
+                '/((?:^|\s+)AND\s+|(?:^|\s+)OR\s+)/i',
+                $qbkey['condition'],
+                -1,
+                PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+            );
+
+            foreach ($conditions as &$condition) {
+                $op = $this->getOperator($condition);
+                if ($op === false) {
+                    continue;
+                }
+
+                $pattern = '/^(\(?)(.*)(' . preg_quote(trim($op), '/') . ')\s*(\(?)(.*(?<!\)))?(\)?)(\(?)$/';
+                if (! preg_match($pattern, $condition, $matches)) {
+                    continue;
+                }
+                // @see https://regex101.com/r/pFEq8N/1
+                // $matches = [
+                //    0 => '(test < foo)',  /* the whole thing */
+                //    1 => '(',             /* optional */
+                //    2 => 'test',          /* the field name */
+                //    3 => '<',             /* operator */
+                //    4 => '',              /* optional */
+                //    5 => 'foo',           /* optional, if $op is e.g. 'IS NULL' */
+                //    6 => ')',             /* optional */
+                //    7 => '',              /* optional */
+                // ];
+
+                // @see https://regex101.com/r/pwVmcM/1
+                // $matches = [
+                //    0 => 'advance_amount < (SELECT MAX(advance_amount) FROM "orders" WHERE "id" > 2)', /* the whole thing */
+                //    1 => '',                /* optional */
+                //    2 => 'advance_amount',  /* the field name */
+                //    3 => '<',               /* operator */
+                //    4 => '(',               /* optional */
+                //    5 => 'SELECT MAX(advance_amount) FROM "orders" WHERE "id" >2',
+                //    6 => ')',               /* optional */
+                //    7 => '',                /* optional */
+                // ];
+
+                if (! empty($matches[5])) {
+                    $protectIdentifiers = false;
+                    if (strpos($matches[5], '.') !== false) {
+                        $protectIdentifiers = true;
+                    }
+
+                    if (strpos($matches[5], ':') === false) {
+                        $matches[5] = $this->db->protectIdentifiers(trim($matches[5]), false, $protectIdentifiers);
+                    }
+                }
+
+                $condition = $matches[1] . $this->db->protectIdentifiers(trim($matches[2]))
+                        . $op . $matches[4] . $matches[5] . $matches[6] . $matches[7];
+            }
+
+            $qbkey = implode('', $conditions);
+        }
+
+        return ($qbKey === 'QBHaving' ? "\nHAVING " : "\nWHERE ")
+                . implode("\n", $this->{$qbKey});
     }
 
     /**
