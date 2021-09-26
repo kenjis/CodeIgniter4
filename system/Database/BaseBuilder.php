@@ -2636,11 +2636,11 @@ class BaseBuilder
         }
 
         $pattern = '/' . implode('|', $_operators) . '/i';
-        if (preg_match_all($pattern, $str, $matche) < 1) {
+        if (preg_match_all($pattern, $str, $matches) < 1) {
             return false;
         }
 
-        return $list ? $matche[0] : $matche[0][0];
+        return $list ? $matches[0] : $matches[0][0];
     }
 
     /**
