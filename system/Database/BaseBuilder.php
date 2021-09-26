@@ -2616,7 +2616,9 @@ class BaseBuilder
         static $_operators;
 
         if (empty($_operators)) {
-            $_les       = ($this->db->likeEscapeStr !== '') ? '\s+' . preg_quote(trim(sprintf($this->db->likeEscapeStr, $this->db->likeEscapeChar)), '/') : '';
+            $_les = ($this->db->likeEscapeStr !== '')
+                ? '\s+' . preg_quote(trim(sprintf($this->db->likeEscapeStr, $this->db->likeEscapeChar)), '/')
+                : '';
             $_operators = [
                 '\s*(?:<|>|!)?=\s*', // =, <=, >=, !=
                 '\s*<>?\s*', // <, <>
