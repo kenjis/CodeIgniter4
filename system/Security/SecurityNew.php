@@ -14,6 +14,7 @@ namespace CodeIgniter\Security;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\Security\CSRF\CSRFConfig;
 use CodeIgniter\Security\CSRF\CSRFCookie;
+use CodeIgniter\Security\CSRF\CSRFSession;
 use CodeIgniter\Security\CSRF\TmpCookieConfig;
 use CodeIgniter\Security\Exceptions\SecurityException;
 use Config\App;
@@ -29,7 +30,17 @@ use Config\Security as SecurityConfig;
 class SecurityNew implements SecurityInterface
 {
     /**
-     * @var CSRFCookie
+     * CSRF Protection Method Cookie
+     */
+    public const CSRF_PROTECTION_COOKIE = 'cookie';
+
+    /**
+     * CSRF Protection Method Session
+     */
+    public const CSRF_PROTECTION_SESSION = 'session';
+
+    /**
+     * @var CSRFCookie|CSRFSession
      */
     private $csrf;
 
@@ -60,9 +71,15 @@ class SecurityNew implements SecurityInterface
             }
         }
 
-        // @TODO If `Config/Security.php` and `Config/Cookie.php` surely exist,
-        // the signature would be CSRFCookie(SecurityConfig, CookieConfig).
-        $this->csrf = new CSRFCookie($csrfConfig, $tmpCookieConfig);
+        $csrfProtection = $configSecurity->csrfProtection ?? self::CSRF_PROTECTION_COOKIE;
+
+        if ($csrfProtection === self::CSRF_PROTECTION_SESSION) {
+            $this->csrf = new CSRFSession($csrfConfig);
+        } else {
+            // @TODO If `Config/Security.php` and `Config/Cookie.php` surely exist,
+            // the signature would be CSRFCookie(SecurityConfig, CookieConfig).
+            $this->csrf = new CSRFCookie($csrfConfig, $tmpCookieConfig);
+        }
     }
 
     /**
