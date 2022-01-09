@@ -157,14 +157,6 @@ class Response extends Message implements MessageInterface, ResponseInterface
         $this->CSPEnabled = $config->CSPEnabled;
 
         // DEPRECATED COOKIE MANAGEMENT
-
-        $this->cookiePrefix   = $config->cookiePrefix;
-        $this->cookieDomain   = $config->cookieDomain;
-        $this->cookiePath     = $config->cookiePath;
-        $this->cookieSecure   = $config->cookieSecure;
-        $this->cookieHTTPOnly = $config->cookieHTTPOnly;
-        $this->cookieSameSite = $config->cookieSameSite ?? Cookie::SAMESITE_LAX;
-
         $config->cookieSameSite = $config->cookieSameSite ?? Cookie::SAMESITE_LAX;
 
         if (! in_array(strtolower($config->cookieSameSite ?: Cookie::SAMESITE_LAX), Cookie::ALLOWED_SAMESITE_VALUES, true)) {
