@@ -384,22 +384,16 @@ class Services extends BaseService
     /**
      * The Mailer class sends emails from any of the available protocol handlers.
      *
-     * @param Mailer|null $config
-     * @param boolean $getShared
-     *
-     * @return MailerInterface
-     *
      * @throws MailerException
      */
-    public static function mailer(Mailer $config = null, bool $getShared = true): MailerInterface
+    public static function mailer(?Mailer $config = null, bool $getShared = true): MailerInterface
     {
-        if ($getShared)
-        {
+        if ($getShared) {
             return static::getSharedInstance('mailer', $config);
         }
 
         // Use Factories to load the default handler
-        $config  = $config ?? config('Mailer');
+        $config ??= config('Mailer');
         $handler = ucfirst($config->handler) . 'Handler';
         $options = [
             'path'       => 'Mailer/Handlers',
@@ -408,12 +402,10 @@ class Services extends BaseService
             'preferApp'  => true,
         ];
 
-        if (! $mailer = Factories::mailer($handler, $options, $config))
-        {
+        if (! $mailer = Factories::mailer($handler, $options, $config)) {
             throw MailerException::forHandlerNotFound();
         }
-        if (! $mailer->isSupported())
-        {
+        if (! $mailer->isSupported()) {
             throw MailerException::forHandlerNotSupported(get_class($mailer));
         }
 

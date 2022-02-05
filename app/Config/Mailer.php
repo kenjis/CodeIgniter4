@@ -14,139 +14,141 @@ namespace Config;
  */
 class Mailer
 {
-	//--------------------------------------------------------------------
-	// Email Settings
-	//--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    // Email Settings
+    //--------------------------------------------------------------------
 
-	/**
-	 * Default values to use for every email (still overriden by parameters).
-	 *
-	 * Valid keys:
-	 * - body, subject, from, to, cc, bcc, replyTo, returnPath, priority, date
-	 *
-	 * @see \CodeIgniter\Mailer\Email::__construct()
-	 *
-	 * @var array<string,mixed>
-	 */
-	public $defaults = [];
+    /**
+     * Default values to use for every email (still overriden by parameters).
+     *
+     * Valid keys:
+     * - body, subject, from, to, cc, bcc, replyTo, returnPath, priority, date
+     *
+     * @see \CodeIgniter\Mailer\Email::__construct()
+     *
+     * @var array<string,mixed>
+     */
+    public $defaults = [];
 
-	/**
-	 * String to use for the User Agent header.
-	 *
-	 * @var string
-	 */
-	public $userAgent = 'CodeIgniter';
+    /**
+     * String to use for the User Agent header.
+     *
+     * @var string
+     */
+    public $userAgent = 'CodeIgniter';
 
-	//--------------------------------------------------------------------
-	// Spool Settings
-	//--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    // Spool Settings
+    //--------------------------------------------------------------------
 
-	/**
-	 * Mail format, either 'text' or 'html'.
-	 *
-	 * @var string
-	 */
-	public $mailFormat = 'text';
+    /**
+     * Mail format, either 'text' or 'html'.
+     *
+     * @var string
+     */
+    public $mailFormat = 'text';
 
-	/**
-	 * Enable word-wrap for text emails.
-	 *
-	 * @var boolean
-	 */
-	public $wordWrap = true;
+    /**
+     * Enable word-wrap for text emails.
+     *
+     * @var bool
+     */
+    public $wordWrap = true;
 
-	/**
-	 * Character count to wrap at
-	 *
-	 * @var integer
-	 */
-	public $wrapChars = 76;
+    /**
+     * Character count to wrap at
+     *
+     * @var int
+     */
+    public $wrapChars = 76;
 
-	/**
-	 * Whether to send bulk BCC emails in batches.
-	 *
-	 * @var boolean
-	 */
-	public $batchMode = false;
+    /**
+     * Whether to send bulk BCC emails in batches.
+     *
+     * @var bool
+     */
+    public $batchMode = false;
 
-	/**
-	 * Number of emails in each BCC batch.
-	 *
-	 * @var integer
-	 */
-	public $batchSize = 200;
+    /**
+     * Number of emails in each BCC batch.
+     *
+     * @var int
+     */
+    public $batchSize = 200;
 
-	//--------------------------------------------------------------------
-	// System Settings
-	//--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    // System Settings
+    //--------------------------------------------------------------------
 
-	/**
-	 * Character set (default: UTF-8).
-	 *
-	 * @var string
-	 */
-	public $charset = 'UTF-8';
+    /**
+     * Character set (default: UTF-8).
+     *
+     * @var string
+     */
+    public $charset = 'UTF-8';
 
-	/**
-	 * Mail encoding.
-	 *
-	 * @var string '8bit' or '7bit'
-	 */
-	public $encoding = '8bit';
+    /**
+     * Mail encoding.
+     *
+     * @var string '8bit' or '7bit'
+     */
+    public $encoding = '8bit';
 
-	/**
-	 * Newline character sequence.
-	 * Use "\r\n" to comply with RFC 822.
-	 *
-	 * @link http://www.ietf.org/rfc/rfc822.txt
-	 * @var  string "\r\n" or "\n"
-	 */
-	public $newline = "\r\n";
+    /**
+     * Newline character sequence.
+     * Use "\r\n" to comply with RFC 822.
+     *
+     * @see http://www.ietf.org/rfc/rfc822.txt
+     *
+     * @var string "\r\n" or "\n"
+     */
+    public $newline = "\r\n";
 
-	/**
-	 * CRLF character sequence.
-	 *
-	 * RFC 2045 specifies that for 'quoted-printable' encoding,
-	 * "\r\n" must be used. However, it appears that some servers
-	 * (even on the receiving end) don't handle it properly and
-	 * switching to "\n", while improper, is the only solution
-	 * that seems to work for all environments.
-	 *
-	 * @link http://www.ietf.org/rfc/rfc822.txt
-	 * @var  string
-	 */
-	public $crlf = "\r\n";
+    /**
+     * CRLF character sequence.
+     *
+     * RFC 2045 specifies that for 'quoted-printable' encoding,
+     * "\r\n" must be used. However, it appears that some servers
+     * (even on the receiving end) don't handle it properly and
+     * switching to "\n", while improper, is the only solution
+     * that seems to work for all environments.
+     *
+     * @see http://www.ietf.org/rfc/rfc822.txt
+     *
+     * @var string
+     */
+    public $crlf = "\r\n";
 
-	//--------------------------------------------------------------------
-	// Handler Settings
-	//--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    // Handler Settings
+    //--------------------------------------------------------------------
 
-	/**
-	 * The name of the preferred handler to use.
-	 * Note: Email is disable during testing by the Dummy handler.
-	 *
-	 * @var string
-	 */
-	public $handler = ENVIRONMENT === 'testing' ? 'dummy' : 'mail';
+    /**
+     * The name of the preferred handler to use.
+     * Note: Email is disable during testing by the Dummy handler.
+     *
+     * @var string
+     */
+    public $handler = ENVIRONMENT === 'testing' ? 'dummy' : 'mail';
 
-	/**
-	 * @var array<string,mixed>
-	 */
-	public $sendmail = [
-		// The server path to Sendmail
-		'mailpath' => '/usr/sbin/sendmail',
-	];
+    /**
+     * @var array<string,mixed>
+     */
+    public $sendmail = [
+        // The server path to Sendmail
+        'mailpath' => '/usr/sbin/sendmail',
+    ];
 
-	/**
-	 * @var array<string,mixed>
-	 */
-	public $smtp = [
-		'hostname'  => '',
-		'username'  => '',
-		'password'  => '',
-		'port'      => 25,
-		'timeout'   => 5,
-		'keepalive' => false,
-		'encrypt'   => 'tls', // tls or ssl
-	];
+    /**
+     * @var array<string,mixed>
+     */
+    public $smtp = [
+        'hostname'  => '',
+        'username'  => '',
+        'password'  => '',
+        'port'      => 25,
+        'timeout'   => 5,
+        'keepalive' => false,
+        'encrypt'   => 'tls', // tls or ssl
+    ];
 }
