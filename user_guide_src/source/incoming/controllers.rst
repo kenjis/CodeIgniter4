@@ -11,7 +11,7 @@ Controllers are the heart of your application, as they determine how HTTP reques
 What is a Controller?
 *********************
 
-A Controller is simply a class file that is named in a way that it can be associated with a URI.
+A Controller is simply a class file that handles a HTTP request. :doc:`URI Routing <routing>` associates a URI with a controller.
 
 Included Properties
 *******************
@@ -116,6 +116,16 @@ then trying to access it using the following URL will not work::
 
 Auto Routing
 ************
+
+This section describes the functionality of the auto-routing.
+It automatically routes an HTTP request, and executes the corresponding controller method
+without route definitions. The auto-routing is enabled by default.
+
+.. note:: To prevent misconfiguration and miscoding, we recommend that you disable
+    the auto-routing feature. See :ref:`use-defined-routes-only`.
+
+.. important:: The auto-routing routes a HTTP request with **any** HTTP method to a controller method.
+
 
 Consider this URI::
 
