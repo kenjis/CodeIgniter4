@@ -25,11 +25,12 @@ use TypeError;
 
 /**
  * @internal
+ * @no-final
  */
-final class ValidationTest extends CIUnitTestCase
+class ValidationTest extends CIUnitTestCase
 {
-    private Validation $validation;
-    private array $config = [
+    protected Validation $validation;
+    protected array $config = [
         'ruleSets' => [
             Rules::class,
             FormatRules::class,
@@ -376,6 +377,24 @@ final class ValidationTest extends CIUnitTestCase
         $this->validation->setRules(['foo' => 'is_numeric']);
         $this->validation->run($data);
         $this->assertSame(['foo' => 'Validation.is_numeric'], $this->validation->getErrors());
+    }
+
+    public function testGetErrorsWithSession(): void
+    {
+        $_SESSION = ['_ci_validation_errors' => 'a:1:{s:3:"foo";s:3:"bar";}'];
+
+        $this->assertSame(['foo' => 'bar'], $this->validation->getErrors());
+
+        $_SESSION = [];
+    }
+
+    public function testGetErrorsWithoutSessionErrorDataWithSession(): void
+    {
+        $_SESSION = ['_ci_validation_errors' => 'a:1:{s:3:"foo";s:3:"bar";}'];
+
+        $this->assertSame([], $this->validation->getErrors(false));
+
+        $_SESSION = [];
     }
 
     public function testGetErrorsWhenNone(): void
@@ -1206,7 +1225,7 @@ final class ValidationTest extends CIUnitTestCase
      *
      * @source https://github.com/codeigniter4/CodeIgniter4/pull/3910#issuecomment-784922913
      */
-    private function placeholderReplacementResultDetermination(string $placeholder = 'id', ?array $data = null)
+    protected function placeholderReplacementResultDetermination(string $placeholder = 'id', ?array $data = null)
     {
         if ($data === null) {
             $data = [$placeholder => 'placeholder-value'];
