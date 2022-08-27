@@ -25,6 +25,7 @@ use CodeIgniter\Entity\Cast\TimestampCast;
 use CodeIgniter\Entity\Cast\URICast;
 use CodeIgniter\Entity\Exceptions\CastException;
 use CodeIgniter\I18n\Time;
+use DateTimeInterface;
 use Exception;
 use JsonSerializable;
 use ReturnTypeWillChange;
@@ -208,7 +209,13 @@ class Entity implements JsonSerializable
                 }, $this->attributes);
             }
 
-            return $this->attributes;
+            return array_map(static function ($value) {
+                if ($value instanceof DateTimeInterface) {
+                    $value = $value->format('Y-m-d H:i:s');
+                }
+
+                return $value;
+            }, $this->attributes);
         }
 
         foreach ($this->attributes as $key => $value) {

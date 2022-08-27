@@ -18,6 +18,7 @@ use CodeIgniter\I18n\Time;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\ReflectionHelper;
 use DateTime;
+use Locale;
 use ReflectionException;
 use Tests\Support\Entity\Cast\CastBase64;
 use Tests\Support\Entity\Cast\CastPassParameters;
@@ -843,6 +844,43 @@ final class EntityTest extends CIUnitTestCase
             'default'    => 'sumfin',
             'created_at' => null,
         ], $result);
+    }
+
+    public function testToRawArrayWithDateMutator()
+    {
+        $time               = Time::parse('2017-07-15 13:23:34');
+        $entity             = $this->getEntity();
+        $entity->created_at = $time;
+
+        $result = $entity->toRawArray();
+
+        $this->assertSame([
+            'foo'        => null,
+            'bar'        => null,
+            'default'    => 'sumfin',
+            'created_at' => '2017-07-15 13:23:34',
+        ], $result);
+    }
+
+    public function testToRawArrayWithDateMutatorInFaLocale()
+    {
+        $currentLocale = Locale::getDefault();
+        Locale::setDefault('fa');
+
+        $time               = Time::parse('2017-07-15 13:23:34');
+        $entity             = $this->getEntity();
+        $entity->created_at = $time;
+
+        $result = $entity->toRawArray();
+
+        $this->assertSame([
+            'foo'        => null,
+            'bar'        => null,
+            'default'    => 'sumfin',
+            'created_at' => '2017-07-15 13:23:34',
+        ], $result);
+
+        Locale::setDefault($currentLocale);
     }
 
     public function testToRawArrayRecursive()
