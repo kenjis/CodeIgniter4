@@ -309,14 +309,12 @@ class Forge
      *
      * @return Forge
      */
-    public function addKey($key, bool $primary = false, bool $unique = false)
+    public function addKey($key, bool $primary = false, bool $unique = false, string $keyName = '')
     {
         if ($primary) {
-            foreach ((array) $key as $one) {
-                $this->primaryKeys[] = $one;
-            }
+            $this->primaryKeys = ['fields' => (array) $key, 'keyName' => $keyName];
         } else {
-            $this->keys[] = $key;
+            $this->keys[] = ['fields' => $key, 'keyName' => $keyName];
 
             if ($unique) {
                 $this->uniqueKeys[] = count($this->keys) - 1;
@@ -333,9 +331,9 @@ class Forge
      *
      * @return Forge
      */
-    public function addPrimaryKey($key)
+    public function addPrimaryKey($key, string $keyName = '')
     {
-        return $this->addKey($key, true);
+        return $this->addKey($key, true, false, $keyName);
     }
 
     /**
@@ -345,9 +343,9 @@ class Forge
      *
      * @return Forge
      */
-    public function addUniqueKey($key)
+    public function addUniqueKey($key, string $keyName = '')
     {
-        return $this->addKey($key, false, true);
+        return $this->addKey($key, false, true, $keyName);
     }
 
     /**
@@ -467,12 +465,12 @@ class Forge
     /**
      * Drop Primary Key
      */
-    public function dropPrimaryKey(string $table): bool
+    public function dropPrimaryKey(string $table, $keyName = ''): bool
     {
         $sql = sprintf(
             'ALTER TABLE %s DROP CONSTRAINT %s',
             $this->db->escapeIdentifiers($this->db->DBPrefix . $table),
-            $this->db->escapeIdentifiers('pk_' . $this->db->DBPrefix . $table),
+            ($keyName === '') ? $this->db->escapeIdentifiers('pk_' . $this->db->DBPrefix . $table) : $keyName,
         );
 
         return $this->db->query($sql);
@@ -1016,15 +1014,19 @@ class Forge
     {
         $sql = '';
 
-        for ($i = 0, $c = count($this->primaryKeys); $i < $c; $i++) {
-            if (! isset($this->fields[$this->primaryKeys[$i]])) {
-                unset($this->primaryKeys[$i]);
+        if (isset($this->primaryKeys['fields'])) {
+            for ($i = 0, $c = count($this->primaryKeys['fields']); $i < $c; $i++) {
+                if (! isset($this->fields[$this->primaryKeys['fields'][$i]])) {
+                    unset($this->primaryKeys['fields'][$i]);
+                }
             }
         }
 
-        if ($this->primaryKeys !== []) {
+        if (isset($this->primaryKeys['fields']) && $this->primaryKeys['fields'] !== []) {
             $sql .= ",\n\tCONSTRAINT " . $this->db->escapeIdentifiers('pk_' . $table)
-                    . ' PRIMARY KEY(' . implode(', ', $this->db->escapeIdentifiers($this->primaryKeys)) . ')';
+                    . ' PRIMARY KEY(' . (($this->primaryKeys['keyName'] === '') ?
+                    implode(', ', $this->db->escapeIdentifiers($this->primaryKeys['fields'])) :
+                    $this->primaryKeys['keyName']) . ')';
         }
 
         return $sql;
@@ -1035,15 +1037,15 @@ class Forge
         $sqls = [];
 
         for ($i = 0, $c = count($this->keys); $i < $c; $i++) {
-            $this->keys[$i] = (array) $this->keys[$i];
+            $this->keys[$i]['fields'] = (array) $this->keys[$i]['fields'];
 
-            for ($i2 = 0, $c2 = count($this->keys[$i]); $i2 < $c2; $i2++) {
-                if (! isset($this->fields[$this->keys[$i][$i2]])) {
-                    unset($this->keys[$i][$i2]);
+            for ($i2 = 0, $c2 = count($this->keys[$i]['fields']); $i2 < $c2; $i2++) {
+                if (! isset($this->fields[$this->keys[$i]['fields'][$i2]])) {
+                    unset($this->keys[$i]['fields'][$i2]);
                 }
             }
 
-            if (count($this->keys[$i]) <= 0) {
+            if (count($this->keys[$i]['fields']) <= 0) {
                 continue;
             }
 
@@ -1055,9 +1057,9 @@ class Forge
                 continue;
             }
 
-            $sqls[] = 'CREATE INDEX ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]))
+            $sqls[] = 'CREATE INDEX ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]['fields']))
                 . ' ON ' . $this->db->escapeIdentifiers($table)
-                . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i])) . ')';
+                . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ')';
         }
 
         return $sqls;

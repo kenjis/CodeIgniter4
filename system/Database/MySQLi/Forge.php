@@ -192,28 +192,33 @@ class Forge extends BaseForge
         $sql = '';
 
         for ($i = 0, $c = count($this->keys); $i < $c; $i++) {
-            if (is_array($this->keys[$i])) {
-                for ($i2 = 0, $c2 = count($this->keys[$i]); $i2 < $c2; $i2++) {
-                    if (! isset($this->fields[$this->keys[$i][$i2]])) {
-                        unset($this->keys[$i][$i2]);
+            if (is_array($this->keys[$i]['fields'])) {
+                for ($i2 = 0, $c2 = count($this->keys[$i]['fields']); $i2 < $c2; $i2++) {
+                    if (! isset($this->fields[$this->keys[$i]['fields'][$i2]])) {
+                        unset($this->keys[$i]['fields'][$i2]);
 
                         continue;
                     }
                 }
-            } elseif (! isset($this->fields[$this->keys[$i]])) {
+            } elseif (! isset($this->fields[$this->keys[$i]['fields']])) {
                 unset($this->keys[$i]);
 
                 continue;
             }
 
-            if (! is_array($this->keys[$i])) {
-                $this->keys[$i] = [$this->keys[$i]];
+            if (! is_array($this->keys[$i]['fields'])) {
+                $this->keys[$i]['fields'] = [$this->keys[$i]['fields']];
             }
 
             $unique = in_array($i, $this->uniqueKeys, true) ? 'UNIQUE ' : '';
 
-            $sql .= ",\n\t{$unique}KEY " . $this->db->escapeIdentifiers(implode('_', $this->keys[$i]))
-                . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i])) . ')';
+            $keyName = ($this->keys[$i]['keyName'] === '') ?
+                $this->db->escapeIdentifiers(implode('_', $this->keys[$i]))
+                . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i])) . ')' :
+                $this->db->escapeIdentifiers($this->keys[$i]['keyName']);
+
+            $sql .= ",\n\t{$unique}KEY " . $keyName
+                . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ')';
         }
 
         $this->keys = [];
@@ -240,7 +245,7 @@ class Forge extends BaseForge
     /**
      * Drop Primary Key
      */
-    public function dropPrimaryKey(string $table): bool
+    public function dropPrimaryKey(string $table, $keyName = ''): bool
     {
         $sql = sprintf(
             'ALTER TABLE %s DROP PRIMARY KEY',

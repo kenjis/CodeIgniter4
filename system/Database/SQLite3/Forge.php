@@ -164,28 +164,28 @@ class Forge extends BaseForge
         $sqls = [];
 
         for ($i = 0, $c = count($this->keys); $i < $c; $i++) {
-            $this->keys[$i] = (array) $this->keys[$i];
+            $this->keys[$i]['fields'] = (array) $this->keys[$i]['fields'];
 
-            for ($i2 = 0, $c2 = count($this->keys[$i]); $i2 < $c2; $i2++) {
-                if (! isset($this->fields[$this->keys[$i][$i2]])) {
-                    unset($this->keys[$i][$i2]);
+            for ($i2 = 0, $c2 = count($this->keys[$i]['fields']); $i2 < $c2; $i2++) {
+                if (! isset($this->fields[$this->keys[$i]['fields'][$i2]])) {
+                    unset($this->keys[$i]['fields'][$i2]);
                 }
             }
-            if (count($this->keys[$i]) <= 0) {
+            if (count($this->keys[$i]['fields']) <= 0) {
                 continue;
             }
 
             if (in_array($i, $this->uniqueKeys, true)) {
                 $sqls[] = 'CREATE UNIQUE INDEX ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]))
                     . ' ON ' . $this->db->escapeIdentifiers($table)
-                    . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i])) . ');';
+                    . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ');';
 
                 continue;
             }
 
-            $sqls[] = 'CREATE INDEX ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]))
+            $sqls[] = 'CREATE INDEX ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]['fields']))
                 . ' ON ' . $this->db->escapeIdentifiers($table)
-                . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i])) . ');';
+                . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ');';
         }
 
         return $sqls;
@@ -254,7 +254,7 @@ class Forge extends BaseForge
     /**
      * Drop Primary Key
      */
-    public function dropPrimaryKey(string $table): bool
+    public function dropPrimaryKey(string $table, $keyName = ''): bool
     {
         $sqlTable = new Table($this->db, $this);
 
