@@ -257,6 +257,8 @@ class Forge extends BaseForge
 
     /**
      * Drop Primary Key
+     *
+     * @param mixed $keyName
      */
     public function dropPrimaryKey(string $table, $keyName = ''): bool
     {

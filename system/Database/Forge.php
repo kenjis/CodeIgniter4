@@ -464,6 +464,8 @@ class Forge
 
     /**
      * Drop Primary Key
+     *
+     * @param mixed $keyName
      */
     public function dropPrimaryKey(string $table, $keyName = ''): bool
     {
@@ -1049,15 +1051,19 @@ class Forge
                 continue;
             }
 
+            $keyName = ($this->keys[$i]['keyName'] === '') ?
+                $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]['fields'])) :
+                $this->db->escapeIdentifiers($this->keys[$i]['keyName']);
+
             if (in_array($i, $this->uniqueKeys, true)) {
                 $sqls[] = 'ALTER TABLE ' . $this->db->escapeIdentifiers($table)
-                    . ' ADD CONSTRAINT ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]))
-                    . ' UNIQUE (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i])) . ')';
+                    . ' ADD CONSTRAINT ' . $keyName
+                    . ' UNIQUE (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ')';
 
                 continue;
             }
 
-            $sqls[] = 'CREATE INDEX ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]['fields']))
+            $sqls[] = 'CREATE INDEX ' . $keyName
                 . ' ON ' . $this->db->escapeIdentifiers($table)
                 . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ')';
         }
