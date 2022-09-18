@@ -312,9 +312,9 @@ class Forge
     public function addKey($key, bool $primary = false, bool $unique = false, string $keyName = '')
     {
         if ($primary) {
-            $this->primaryKeys = ['fields' => (array) $key, 'keyName' => $keyName];
+            $this->primaryKeys = ['fields' => (array) $key, 'keyName' => $this->db->protectIdentifiers($keyName)];
         } else {
-            $this->keys[] = ['fields' => $key, 'keyName' => $keyName];
+            $this->keys[] = ['fields' => $key, 'keyName' => $this->db->protectIdentifiers($keyName)];
 
             if ($unique) {
                 $this->uniqueKeys[] = count($this->keys) - 1;
@@ -1025,10 +1025,8 @@ class Forge
         }
 
         if (isset($this->primaryKeys['fields']) && $this->primaryKeys['fields'] !== []) {
-            $sql .= ",\n\tCONSTRAINT " . $this->db->escapeIdentifiers('pk_' . $table)
-                    . ' PRIMARY KEY(' . (($this->primaryKeys['keyName'] === '') ?
-                    implode(', ', $this->db->escapeIdentifiers($this->primaryKeys['fields'])) :
-                    $this->primaryKeys['keyName']) . ')';
+            $sql .= ",\n\tCONSTRAINT " . ($this->primaryKeys['keyName'] === '' ? $this->db->escapeIdentifiers('pk_' . $table) : $this->primaryKeys['keyName'])
+                    . ' PRIMARY KEY(' . implode(', ', $this->db->escapeIdentifiers($this->primaryKeys['fields'])) . ')';
         }
 
         return $sql;
