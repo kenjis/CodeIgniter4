@@ -175,15 +175,19 @@ class Forge extends BaseForge
                 continue;
             }
 
+            $keyName = ($this->keys[$i]['keyName'] === '') ?
+                $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]['fields'])) :
+                $this->db->escapeIdentifiers($this->keys[$i]['keyName']);
+
             if (in_array($i, $this->uniqueKeys, true)) {
-                $sqls[] = 'CREATE UNIQUE INDEX ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]))
+                $sqls[] = 'CREATE UNIQUE INDEX ' . $keyName
                     . ' ON ' . $this->db->escapeIdentifiers($table)
                     . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ');';
 
                 continue;
             }
 
-            $sqls[] = 'CREATE INDEX ' . $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]['fields']))
+            $sqls[] = 'CREATE INDEX ' . $keyName
                 . ' ON ' . $this->db->escapeIdentifiers($table)
                 . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ');';
         }
