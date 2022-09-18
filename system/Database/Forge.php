@@ -443,11 +443,11 @@ class Forge
      *
      * @throws DatabaseException
      */
-    public function dropKey(string $table, string $keyName)
+    public function dropKey(string $table, string $keyName, $prefixKeyName = true)
     {
         $sql = sprintf(
             $this->dropIndexStr,
-            $this->db->escapeIdentifiers($this->db->DBPrefix . $keyName),
+            $this->db->escapeIdentifiers(($prefixKeyName === true ? $this->db->DBPrefix : '') . $keyName),
             $this->db->escapeIdentifiers($this->db->DBPrefix . $table),
         );
 
@@ -472,7 +472,7 @@ class Forge
         $sql = sprintf(
             'ALTER TABLE %s DROP CONSTRAINT %s',
             $this->db->escapeIdentifiers($this->db->DBPrefix . $table),
-            ($keyName === '') ? $this->db->escapeIdentifiers('pk_' . $this->db->DBPrefix . $table) : $keyName,
+            ($keyName === '') ? $this->db->escapeIdentifiers('pk_' . $this->db->DBPrefix . $table) : $this->db->escapeIdentifiers($keyName),
         );
 
         return $this->db->query($sql);
