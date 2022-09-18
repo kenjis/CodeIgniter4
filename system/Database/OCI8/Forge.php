@@ -279,4 +279,74 @@ class Forge extends BaseForge
 
         return $sql;
     }
+
+    protected function _processForeignKeys(string $table): string
+    {
+        $sql = '';
+
+        $allowActions = [
+            'CASCADE',
+            'SET NULL',
+            'NO ACTION',
+        ];
+
+        foreach ($this->foreignKeys as $fkey) {
+            $nameIndex            = $table . '_' . implode('_', $fkey['field']) . '_fk';
+            $nameIndexFilled      = $this->db->escapeIdentifiers($nameIndex);
+            $foreignKeyFilled     = implode(', ', $this->db->escapeIdentifiers($fkey['field']));
+            $referenceTableFilled = $this->db->escapeIdentifiers($this->db->DBPrefix . $fkey['referenceTable']);
+            $referenceFieldFilled = implode(', ', $this->db->escapeIdentifiers($fkey['referenceField']));
+
+            $formatSql = ",\n\tCONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s(%s)";
+            $sql .= sprintf($formatSql, $nameIndexFilled, $foreignKeyFilled, $referenceTableFilled, $referenceFieldFilled);
+
+            if ($fkey['onDelete'] !== false && in_array($fkey['onDelete'], $allowActions, true)) {
+                $sql .= ' ON DELETE ' . $fkey['onDelete'];
+            }
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Drop Key
+     *
+     * @param mixed $prefixKeyName
+     *
+     * @return bool
+     *
+     * @throws DatabaseException
+     */
+    public function dropKey(string $table, string $keyName, bool $prefixKeyName = true)
+    {
+        $keyName = $this->db->escapeIdentifiers(($prefixKeyName === true ? $this->db->DBPrefix : '') . $keyName);
+
+        // check if key is a constraint
+        $constraint = $this->db->query("select constraint_name from all_constraints where index_name = '" . trim($keyName, '"') . "'")->getResultArray();
+
+        $sql = sprintf(
+            $this->dropIndexStr,
+            $keyName,
+            $this->db->escapeIdentifiers($this->db->DBPrefix . $table),
+        );
+
+        if (count($constraint) !== 0) {
+            $sqlString = $this->dropConstraintStr;
+            $sql       = sprintf(
+                $this->dropConstraintStr,
+                $this->db->escapeIdentifiers($this->db->DBPrefix . $table),
+                $keyName,
+            );
+        }
+
+        if ($sql === '') {
+            if ($this->db->DBDebug) {
+                throw new DatabaseException('This feature is not available for the database you are using.');
+            }
+
+            return false;
+        }
+
+        return $this->db->query($sql);
+    }
 }
