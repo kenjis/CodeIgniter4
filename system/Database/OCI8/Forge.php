@@ -11,7 +11,6 @@
 
 namespace CodeIgniter\Database\OCI8;
 
-use CodeIgniter\Database\Exceptions\DatabaseException;
 use CodeIgniter\Database\Forge as BaseForge;
 
 /**
@@ -310,41 +309,12 @@ class Forge extends BaseForge
     }
 
     /**
-     * Drop Key
-     *
-     * @return bool
-     *
-     * @throws DatabaseException
+     * Constructs sql to check if key is a constraint.
      */
-    public function dropKey(string $table, string $keyName, bool $prefixKeyName = true)
+    protected function _dropKeyAsConstraint(string $table, string $constraintName): string
     {
-        $keyName = $this->db->escapeIdentifiers(($prefixKeyName === true ? $this->db->DBPrefix : '') . $keyName);
-
-        // check if key is a constraint
-        $constraint = $this->db->query("select constraint_name from all_constraints where index_name = '" . trim($keyName, '"') . "'")->getResultArray();
-
-        $sql = sprintf(
-            $this->dropIndexStr,
-            $keyName,
-            $this->db->escapeIdentifiers($this->db->DBPrefix . $table),
-        );
-
-        if ($constraint !== []) {
-            $sql = sprintf(
-                $this->dropConstraintStr,
-                $this->db->escapeIdentifiers($this->db->DBPrefix . $table),
-                $keyName,
-            );
-        }
-
-        if ($sql === '') {
-            if ($this->db->DBDebug) {
-                throw new DatabaseException('This feature is not available for the database you are using.');
-            }
-
-            return false;
-        }
-
-        return $this->db->query($sql);
+        return "select constraint_name from all_constraints where table_name = '"
+            . trim($table, '"') . "' AND index_name = '"
+            . trim($constraintName, '"') . "'";
     }
 }

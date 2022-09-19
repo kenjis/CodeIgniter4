@@ -445,11 +445,23 @@ class Forge
      */
     public function dropKey(string $table, string $keyName, bool $prefixKeyName = true)
     {
-        $sql = sprintf(
-            $this->dropIndexStr,
-            $this->db->escapeIdentifiers(($prefixKeyName === true ? $this->db->DBPrefix : '') . $keyName),
-            $this->db->escapeIdentifiers($this->db->DBPrefix . $table),
-        );
+        $keyName             = $this->db->escapeIdentifiers(($prefixKeyName === true ? $this->db->DBPrefix : '') . $keyName);
+        $table               = $this->db->escapeIdentifiers($this->db->DBPrefix . $table);
+        $dropKeyAsConstraint = $this->dropKeyAsConstraint($table, $keyName);
+
+        if ($dropKeyAsConstraint === true) {
+            $sql = sprintf(
+                $this->dropConstraintStr,
+                $table,
+                $keyName,
+            );
+        } else {
+            $sql = sprintf(
+                $this->dropIndexStr,
+                $keyName,
+                $table,
+            );
+        }
 
         if ($sql === '') {
             if ($this->db->DBDebug) {
@@ -460,6 +472,28 @@ class Forge
         }
 
         return $this->db->query($sql);
+    }
+
+    /**
+     * Checks if if key needs to be dropped as a constraint.
+     */
+    protected function dropKeyAsConstraint(string $table, string $constraintName): bool
+    {
+        $sql = $this->_dropKeyAsConstraint($table, $constraintName);
+
+        if ($sql === '') {
+            return false;
+        }
+
+        return $this->db->query($sql)->getResultArray() !== [];
+    }
+
+    /**
+     * Constructs sql to check if key is a constraint.
+     */
+    protected function _dropKeyAsConstraint(string $table, string $constraintName): string
+    {
+        return '';
     }
 
     /**
