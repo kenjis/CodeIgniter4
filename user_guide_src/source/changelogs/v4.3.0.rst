@@ -95,6 +95,10 @@ Others
 - ``BaseBuilder::_updateBatch()``
     - The second parameter ``$values`` has changed to ``$keys``.
     - The third parameter ``$index`` has changed to ``$values``. The parameter type also has changed to ``array``.
+- The method signature of ``Forge::dropKey()`` has changed. An additional optional parameter ``$prefixKeyName`` has been added.
+- The method signature of ``Forge::addKey()`` has changed. An additional optional parameter ``$keyName`` has been added.
+- The method signature of ``Forge::addPrimaryKey()`` has changed. An additional optional parameter ``$keyName`` has been added.
+- The method signature of ``Forge::addUniqueKey()`` has changed. An additional optional parameter ``$keyName`` has been added.
 
 Enhancements
 ************
@@ -126,6 +130,7 @@ Database
 - Improved the SQL structure for ``Builder::updateBatch()``. See :ref:`update-batch` for the details.
 - Improved data returned by ``BaseConnection::getForeignKeyData()``. All DBMS returns the same structure.
 - ``Forge::addForeignKey()`` now includes a name parameter to manual set foreign key names. Not supported in SQLite3.
+- Added the ability to manually set index names. These methods include: ``Forge::addKey()``, ``Forge::addPrimaryKey()``, and ``Forge::addUniqueKey()``
 
 Model
 =====
