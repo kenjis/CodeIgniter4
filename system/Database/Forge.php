@@ -1088,9 +1088,15 @@ class Forge
                 $this->db->escapeIdentifiers($this->keys[$i]['keyName']);
 
             if (in_array($i, $this->uniqueKeys, true)) {
-                $sqls[] = 'ALTER TABLE ' . $this->db->escapeIdentifiers($table)
-                    . ' ADD CONSTRAINT ' . $keyName
-                    . ' UNIQUE (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ')';
+                if ($this->db->DBDriver === 'SQLite3') {
+                    $sqls[] = 'CREATE UNIQUE INDEX ' . $keyName
+                        . ' ON ' . $this->db->escapeIdentifiers($table)
+                        . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ')';
+                } else {
+                    $sqls[] = 'ALTER TABLE ' . $this->db->escapeIdentifiers($table)
+                        . ' ADD CONSTRAINT ' . $keyName
+                        . ' UNIQUE (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ')';
+                }
 
                 continue;
             }

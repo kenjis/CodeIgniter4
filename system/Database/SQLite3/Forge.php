@@ -157,45 +157,6 @@ class Forge extends BaseForge
     }
 
     /**
-     * Process indexes
-     */
-    protected function _processIndexes(string $table): array
-    {
-        $sqls = [];
-
-        for ($i = 0, $c = count($this->keys); $i < $c; $i++) {
-            $this->keys[$i]['fields'] = (array) $this->keys[$i]['fields'];
-
-            for ($i2 = 0, $c2 = count($this->keys[$i]['fields']); $i2 < $c2; $i2++) {
-                if (! isset($this->fields[$this->keys[$i]['fields'][$i2]])) {
-                    unset($this->keys[$i]['fields'][$i2]);
-                }
-            }
-            if (count($this->keys[$i]['fields']) <= 0) {
-                continue;
-            }
-
-            $keyName = ($this->keys[$i]['keyName'] === '') ?
-                $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]['fields'])) :
-                $this->db->escapeIdentifiers($this->keys[$i]['keyName']);
-
-            if (in_array($i, $this->uniqueKeys, true)) {
-                $sqls[] = 'CREATE UNIQUE INDEX ' . $keyName
-                    . ' ON ' . $this->db->escapeIdentifiers($table)
-                    . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ');';
-
-                continue;
-            }
-
-            $sqls[] = 'CREATE INDEX ' . $keyName
-                . ' ON ' . $this->db->escapeIdentifiers($table)
-                . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ');';
-        }
-
-        return $sqls;
-    }
-
-    /**
      * Field attribute TYPE
      *
      * Performs a data type mapping between different databases.
