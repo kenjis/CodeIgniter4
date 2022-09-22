@@ -313,7 +313,7 @@ class Forge extends BaseForge
      */
     protected function _dropKeyAsConstraint(string $table, string $constraintName): string
     {
-        return "select constraint_name from all_constraints where table_name = '"
+        return "SELECT constraint_name FROM all_constraints WHERE table_name = '"
             . trim($table, '"') . "' AND index_name = '"
             . trim($constraintName, '"') . "'";
     }
