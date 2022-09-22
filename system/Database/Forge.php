@@ -500,10 +500,8 @@ class Forge
 
     /**
      * Drop Primary Key
-     *
-     * @param mixed $keyName
      */
-    public function dropPrimaryKey(string $table, $keyName = ''): bool
+    public function dropPrimaryKey(string $table, string $keyName = ''): bool
     {
         $sql = sprintf(
             'ALTER TABLE %s DROP CONSTRAINT %s',

@@ -218,10 +218,8 @@ class Forge extends BaseForge
 
     /**
      * Drop Primary Key
-     *
-     * @param mixed $keyName
      */
-    public function dropPrimaryKey(string $table, $keyName = ''): bool
+    public function dropPrimaryKey(string $table, string $keyName = ''): bool
     {
         $sqlTable = new Table($this->db, $this);
 
