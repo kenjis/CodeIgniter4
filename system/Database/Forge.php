@@ -39,6 +39,8 @@ class Forge
     /**
      * List of keys.
      *
+     * @phpstan-var array{fields: string[], keyName: string}
+     *
      * @var array
      */
     protected $keys = [];
@@ -51,7 +53,9 @@ class Forge
     protected $uniqueKeys = [];
 
     /**
-     * List of primary keys.
+     * Primary keys.
+     *
+     * @phpstan-var array{fields: string[], keyName: string}
      *
      * @var array
      */
@@ -314,7 +318,7 @@ class Forge
         if ($primary) {
             $this->primaryKeys = ['fields' => (array) $key, 'keyName' => $this->db->protectIdentifiers($keyName)];
         } else {
-            $this->keys[] = ['fields' => $key, 'keyName' => $this->db->protectIdentifiers($keyName)];
+            $this->keys[] = ['fields' => (array) $key, 'keyName' => $this->db->protectIdentifiers($keyName)];
 
             if ($unique) {
                 $this->uniqueKeys[] = count($this->keys) - 1;
