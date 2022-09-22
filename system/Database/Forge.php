@@ -40,7 +40,6 @@ class Forge
      * List of keys.
      *
      * @phpstan-var array{fields: string[], keyName: string}
-     *
      * @var array
      */
     protected $keys = [];
@@ -56,7 +55,6 @@ class Forge
      * Primary keys.
      *
      * @phpstan-var array{fields: string[], keyName: string}
-     *
      * @var array
      */
     protected $primaryKeys = [];
@@ -316,9 +314,9 @@ class Forge
     public function addKey($key, bool $primary = false, bool $unique = false, string $keyName = '')
     {
         if ($primary) {
-            $this->primaryKeys = ['fields' => (array) $key, 'keyName' => $this->db->protectIdentifiers($keyName)];
+            $this->primaryKeys = ['fields' => (array) $key, 'keyName' => $keyName];
         } else {
-            $this->keys[] = ['fields' => (array) $key, 'keyName' => $this->db->protectIdentifiers($keyName)];
+            $this->keys[] = ['fields' => (array) $key, 'keyName' => $keyName];
 
             if ($unique) {
                 $this->uniqueKeys[] = count($this->keys) - 1;
@@ -1063,7 +1061,9 @@ class Forge
         }
 
         if (isset($this->primaryKeys['fields']) && $this->primaryKeys['fields'] !== []) {
-            $sql .= ",\n\tCONSTRAINT " . ($this->primaryKeys['keyName'] === '' ? $this->db->escapeIdentifiers('pk_' . $table) : $this->primaryKeys['keyName'])
+            $sql .= ",\n\tCONSTRAINT " . $this->db->escapeIdentifiers(($this->primaryKeys['keyName'] === '' ?
+                'pk_' . $table :
+                $this->primaryKeys['keyName']))
                     . ' PRIMARY KEY(' . implode(', ', $this->db->escapeIdentifiers($this->primaryKeys['fields'])) . ')';
         }
 
@@ -1087,9 +1087,9 @@ class Forge
                 continue;
             }
 
-            $keyName = ($this->keys[$i]['keyName'] === '') ?
-                $this->db->escapeIdentifiers($table . '_' . implode('_', $this->keys[$i]['fields'])) :
-                $this->db->escapeIdentifiers($this->keys[$i]['keyName']);
+            $keyName = $this->db->escapeIdentifiers(($this->keys[$i]['keyName'] === '') ?
+                $table . '_' . implode('_', $this->keys[$i]['fields']) :
+                $this->keys[$i]['keyName']);
 
             if (in_array($i, $this->uniqueKeys, true)) {
                 if ($this->db->DBDriver === 'SQLite3') {

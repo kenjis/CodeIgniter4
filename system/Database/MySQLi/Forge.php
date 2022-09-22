@@ -212,9 +212,9 @@ class Forge extends BaseForge
 
             $unique = in_array($i, $this->uniqueKeys, true) ? 'UNIQUE ' : '';
 
-            $keyName = ($this->keys[$i]['keyName'] === '') ?
-                $this->db->escapeIdentifiers(implode('_', $this->keys[$i]['fields'])) :
-                $this->db->escapeIdentifiers($this->keys[$i]['keyName']);
+            $keyName = $this->db->escapeIdentifiers(($this->keys[$i]['keyName'] === '') ?
+                implode('_', $this->keys[$i]['fields']) :
+                $this->keys[$i]['keyName']);
 
             $sql .= ",\n\t{$unique}KEY " . $keyName
                 . ' (' . implode(', ', $this->db->escapeIdentifiers($this->keys[$i]['fields'])) . ')';
