@@ -39,7 +39,7 @@ class Forge
     /**
      * List of keys.
      *
-     * @phpstan-var array{fields: string[], keyName: string}
+     * @phpstan-var array|array{fields: string[], keyName: string}
      * @var array
      */
     protected $keys = [];
@@ -54,7 +54,7 @@ class Forge
     /**
      * Primary keys.
      *
-     * @phpstan-var array{fields: string[], keyName: string}
+     * @phpstan-var array|array{fields: string[], keyName: string}
      * @var array
      */
     protected $primaryKeys = [];
