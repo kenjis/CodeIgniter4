@@ -280,34 +280,6 @@ class Forge extends BaseForge
         return $sql;
     }
 
-    protected function _processForeignKeys(string $table): string
-    {
-        $sql = '';
-
-        $allowActions = [
-            'CASCADE',
-            'SET NULL',
-            'NO ACTION',
-        ];
-
-        foreach ($this->foreignKeys as $fkey) {
-            $nameIndex            = $table . '_' . implode('_', $fkey['field']) . '_fk';
-            $nameIndexFilled      = $this->db->escapeIdentifiers($nameIndex);
-            $foreignKeyFilled     = implode(', ', $this->db->escapeIdentifiers($fkey['field']));
-            $referenceTableFilled = $this->db->escapeIdentifiers($this->db->DBPrefix . $fkey['referenceTable']);
-            $referenceFieldFilled = implode(', ', $this->db->escapeIdentifiers($fkey['referenceField']));
-
-            $formatSql = ",\n\tCONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s(%s)";
-            $sql .= sprintf($formatSql, $nameIndexFilled, $foreignKeyFilled, $referenceTableFilled, $referenceFieldFilled);
-
-            if ($fkey['onDelete'] !== false && in_array($fkey['onDelete'], $allowActions, true)) {
-                $sql .= ' ON DELETE ' . $fkey['onDelete'];
-            }
-        }
-
-        return $sql;
-    }
-
     /**
      * Constructs sql to check if key is a constraint.
      */
