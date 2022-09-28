@@ -40,8 +40,6 @@ class Forge
      * List of keys.
      *
      * @phpstan-var array{}|array{array{fields: string[], keyName: string}}
-     *
-     * @var array
      */
     protected $keys = [];
 
@@ -56,8 +54,6 @@ class Forge
      * Primary keys.
      *
      * @phpstan-var array{}|array{fields: string[], keyName: string}
-     *
-     * @var array
      */
     protected $primaryKeys = [];
 
@@ -407,10 +403,8 @@ class Forge
      * @param string|string[] $tableField
      *
      * @throws DatabaseException
-     *
-     * @return Forge
      */
-    public function addForeignKey($fieldName = '', string $tableName = '', $tableField = '', string $onUpdate = '', string $onDelete = '', string $fkName = '')
+    public function addForeignKey($fieldName = '', string $tableName = '', $tableField = '', string $onUpdate = '', string $onDelete = '', string $fkName = ''): Forge
     {
         $fieldName  = (array) $fieldName;
         $tableField = (array) $tableField;
@@ -444,10 +438,8 @@ class Forge
      * Drop Key
      *
      * @throws DatabaseException
-     *
-     * @return bool
      */
-    public function dropKey(string $table, string $keyName, bool $prefixKeyName = true)
+    public function dropKey(string $table, string $keyName, bool $prefixKeyName = true): bool
     {
         $keyName             = $this->db->escapeIdentifiers(($prefixKeyName === true ? $this->db->DBPrefix : '') . $keyName);
         $table               = $this->db->escapeIdentifiers($this->db->DBPrefix . $table);
@@ -515,9 +507,9 @@ class Forge
     }
 
     /**
-     * @throws DatabaseException
-     *
      * @return BaseResult|bool|false|mixed|Query
+     *
+     * @throws DatabaseException
      */
     public function dropForeignKey(string $table, string $foreignName)
     {
@@ -539,9 +531,9 @@ class Forge
     }
 
     /**
-     * @throws DatabaseException
-     *
      * @return mixed
+     *
+     * @throws DatabaseException
      */
     public function createTable(string $table, bool $ifNotExists = false, array $attributes = [])
     {
@@ -631,9 +623,9 @@ class Forge
     }
 
     /**
-     * @throws DatabaseException
-     *
      * @return mixed
+     *
+     * @throws DatabaseException
      */
     public function dropTable(string $tableName, bool $ifExists = false, bool $cascade = false)
     {
@@ -697,9 +689,9 @@ class Forge
     }
 
     /**
-     * @throws DatabaseException
-     *
      * @return mixed
+     *
+     * @throws DatabaseException
      */
     public function renameTable(string $tableName, string $newTableName)
     {
@@ -774,9 +766,9 @@ class Forge
     /**
      * @param array|string $columnName
      *
-     * @throws DatabaseException
-     *
      * @return mixed
+     *
+     * @throws DatabaseException
      */
     public function dropColumn(string $table, $columnName)
     {
