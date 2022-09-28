@@ -223,10 +223,8 @@ class Forge extends BaseForge
 
     /**
      * Drop Key
-     *
-     * @return bool
      */
-    public function dropKey(string $table, string $keyName, bool $prefixKeyName = true)
+    public function dropKey(string $table, string $keyName, bool $prefixKeyName = true): bool
     {
         $sql = sprintf(
             $this->dropIndexStr,
