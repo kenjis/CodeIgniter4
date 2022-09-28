@@ -192,7 +192,7 @@ class Forge extends BaseForge
         $sql = '';
 
         for ($i = 0, $c = count($this->keys); $i < $c; $i++) {
-            if (is_array($this->keys[$i]['fields'])) {
+            if (isset($this->keys[$i]['fields'])) {
                 for ($i2 = 0, $c2 = count($this->keys[$i]['fields']); $i2 < $c2; $i2++) {
                     if (! isset($this->fields[$this->keys[$i]['fields'][$i2]])) {
                         unset($this->keys[$i]['fields'][$i2]);
@@ -200,10 +200,6 @@ class Forge extends BaseForge
                         continue;
                     }
                 }
-            } elseif (! isset($this->fields[$this->keys[$i]['fields']])) {
-                unset($this->keys[$i]);
-
-                continue;
             }
 
             if (! is_array($this->keys[$i]['fields'])) {
