@@ -775,10 +775,6 @@ class URI
     {
         $this->path = $this->filterPath($path);
 
-        $tempPath = trim($this->path, '/');
-
-        $this->segments = ($tempPath === '') ? [] : explode('/', $tempPath);
-
         return $this;
     }
 
