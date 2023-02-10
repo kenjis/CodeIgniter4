@@ -203,12 +203,7 @@ class URIFactory
             // Set URI::$baseURL
             $currentBaseURL = (string) (new URI($baseURL))->setHost($host);
             $uri->setBaseURL($currentBaseURL);
-
             $uri->setRoutePath($routePath);
-
-            $uri->setScheme(parse_url($baseURL, PHP_URL_SCHEME));
-            $uri->setHost($host);
-            $uri->setPort(parse_url($baseURL, PHP_URL_PORT));
 
             // Ensure we have any query vars
             $uri->setQuery($this->server['QUERY_STRING'] ?? '');
