@@ -195,14 +195,14 @@ class URIFactory
         // Based on our baseURL and allowedHostnames provided by the developer
         // and HTTP_HOST, set our current domain name, scheme.
         if ($baseURL !== '') {
+            $uri = new URI($baseURL . $routePath);
+
             $host = $this->determineHost($baseURL);
+            $uri->setHost($host);
 
             // Set URI::$baseURL
-            $uri            = new URI($baseURL);
-            $currentBaseURL = (string) $uri->setHost($host);
+            $currentBaseURL = (string) (new URI($baseURL))->setHost($host);
             $uri->setBaseURL($currentBaseURL);
-
-            $uri->setPath($routePath);
 
             $uri->setRoutePath($routePath);
 
