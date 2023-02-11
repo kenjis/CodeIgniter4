@@ -188,7 +188,9 @@ class URIFactory
 
         if ($config->baseURL === '' && ! is_cli()) {
             throw new ConfigException(
-                'You have an empty or invalid baseURL. The baseURL value must be set in app/Config/App.php, or through the .env file.'
+                'You have an empty or invalid baseURL.'
+                . ' The baseURL value must be set in app/Config/App.php,'
+                . ' or through the .env file.'
             );
         }
 
