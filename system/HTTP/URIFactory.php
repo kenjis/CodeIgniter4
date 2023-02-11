@@ -192,36 +192,33 @@ class URIFactory
             ? $config->baseURL
             : rtrim($config->baseURL, '/ ') . '/';
 
-        // Based on our baseURL and allowedHostnames provided by the developer
-        // and HTTP_HOST, set our current domain name, scheme.
-        if ($baseURL !== '') {
-            $uri = new URI($baseURL . $routePath);
-
-            $host = $this->determineHost($baseURL);
-            $uri->setHost($host);
-
-            // Set URI::$baseURL
-            $currentBaseURL = (string) (new URI($baseURL))->setHost($host);
-            $uri->setBaseURL($currentBaseURL);
-            $uri->setRoutePath($routePath);
-
-            // Ensure we have any query vars
-            $uri->setQuery($this->server['QUERY_STRING'] ?? '');
-
-            // Check if the scheme needs to be coerced into its secure version
-            if ($config->forceGlobalSecureRequests && $uri->getScheme() === 'http') {
-                $uri->setScheme('https');
-            }
-
-            return $uri;
-        }
-        if (! is_cli()) {
+        if ($baseURL === '' && ! is_cli()) {
             throw new ConfigException(
                 'You have an empty or invalid baseURL. The baseURL value must be set in app/Config/App.php, or through the .env file.'
             );
         }
 
-        return new URI();
+        // Based on our baseURL and allowedHostnames provided by the developer
+        // and HTTP_HOST, set our current domain name, scheme.
+        $uri = new URI($baseURL . $routePath);
+
+        $host = $this->determineHost($baseURL);
+        $uri->setHost($host);
+
+        // Set URI::$baseURL
+        $currentBaseURL = (string) (new URI($baseURL))->setHost($host);
+        $uri->setBaseURL($currentBaseURL);
+        $uri->setRoutePath($routePath);
+
+        // Ensure we have any query vars
+        $uri->setQuery($this->server['QUERY_STRING'] ?? '');
+
+        // Check if the scheme needs to be coerced into its secure version
+        if ($config->forceGlobalSecureRequests && $uri->getScheme() === 'http') {
+            $uri->setScheme('https');
+        }
+
+        return $uri;
     }
 
     /**
