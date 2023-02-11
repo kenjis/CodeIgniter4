@@ -186,17 +186,17 @@ class URIFactory
     {
         $config = $this->appConfig;
 
+        if ($config->baseURL === '' && ! is_cli()) {
+            throw new ConfigException(
+                'You have an empty or invalid baseURL. The baseURL value must be set in app/Config/App.php, or through the .env file.'
+            );
+        }
+
         // It's possible the user forgot a trailing slash on their
         // baseURL, so let's help them out.
         $baseURL = ($config->baseURL === '')
             ? $config->baseURL
             : rtrim($config->baseURL, '/ ') . '/';
-
-        if ($baseURL === '' && ! is_cli()) {
-            throw new ConfigException(
-                'You have an empty or invalid baseURL. The baseURL value must be set in app/Config/App.php, or through the .env file.'
-            );
-        }
 
         // Check for an index page
         $indexPage = '';
