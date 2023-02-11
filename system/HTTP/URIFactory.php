@@ -198,9 +198,20 @@ class URIFactory
             );
         }
 
+        // Check for an index page
+        $indexPage = '';
+        if ($config->indexPage !== '') {
+            $indexPage = $config->indexPage;
+
+            // Check if we need a separator
+            if ($routePath !== '' && $routePath[0] !== '/' && $routePath[0] !== '?') {
+                $indexPage .= '/';
+            }
+        }
+
         // Based on our baseURL and allowedHostnames provided by the developer
         // and HTTP_HOST, set our current domain name, scheme.
-        $uri = new URI($baseURL . $routePath);
+        $uri = new URI($baseURL . $indexPage . $routePath);
 
         $host = $this->determineHost($baseURL);
         $uri->setHost($host);

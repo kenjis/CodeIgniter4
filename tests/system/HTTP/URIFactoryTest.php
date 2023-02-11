@@ -52,8 +52,8 @@ final class URIFactoryTest extends CIUnitTestCase
         $uri = $factory->createFromGlobals();
 
         $this->assertInstanceOf(URI::class, $uri);
-        $this->assertSame('http://localhost:8080/woot?code=good', (string) $uri);
-        $this->assertSame('/woot', $uri->getPath());
+        $this->assertSame('http://localhost:8080/index.php/woot?code=good', (string) $uri);
+        $this->assertSame('/index.php/woot', $uri->getPath());
         $this->assertSame('woot', $uri->getRoutePath());
     }
 
@@ -74,8 +74,8 @@ final class URIFactoryTest extends CIUnitTestCase
         $uri = $factory->createFromGlobals();
 
         $this->assertInstanceOf(URI::class, $uri);
-        $this->assertSame('http://localhost:8888/ci431/public/woot?code=good', (string) $uri);
-        $this->assertSame('/ci431/public/woot', $uri->getPath());
+        $this->assertSame('http://localhost:8888/ci431/public/index.php/woot?code=good', (string) $uri);
+        $this->assertSame('/ci431/public/index.php/woot', $uri->getPath());
         $this->assertSame('woot', $uri->getRoutePath());
     }
 }
