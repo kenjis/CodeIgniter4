@@ -38,6 +38,7 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\Response;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\URI;
+use CodeIgniter\HTTP\URIFactory;
 use CodeIgniter\HTTP\UserAgent;
 use CodeIgniter\Images\Handlers\BaseHandler;
 use CodeIgniter\Language\Language;
@@ -732,12 +733,20 @@ class Services extends BaseService
      *
      * @param string $uri
      *
-     * @return URI
+     * @return URI The current URI if $uri is null.
      */
     public static function uri(?string $uri = null, bool $getShared = true)
     {
         if ($getShared) {
             return static::getSharedInstance('uri', $uri);
+        }
+
+        /** @var App $appConfig */
+        $appConfig = config('App');
+        $factory   = new URIFactory($_SERVER, $_GET, $appConfig);
+
+        if ($uri === null) {
+            return $factory->createFromGlobals();
         }
 
         return new URI($uri);

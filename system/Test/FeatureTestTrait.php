@@ -284,15 +284,19 @@ trait FeatureTestTrait
      */
     protected function setupRequest(string $method, ?string $path = null): IncomingRequest
     {
-        $path    = URI::removeDotSegments($path);
+        // $path may have a query in it
+        $parts = explode('?', $path);
+        $path  = $parts[0];
+        $path  = URI::removeDotSegments($path);
+        $query = $parts[1] ?? '';
+
+        // @TODO setup $_SERVER for URI
+        $_SERVER['QUERY_STRING'] = $query;
+
         $config  = config(App::class);
         $request = Services::request($config, false);
 
-        // $path may have a query in it
-        $parts                   = explode('?', $path);
-        $_SERVER['QUERY_STRING'] = $parts[1] ?? '';
-
-        $request->setPath($parts[0]);
+        $request->setPath($path);
         $request->setMethod($method);
         $request->setProtocolVersion('1.1');
 

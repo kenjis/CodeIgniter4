@@ -181,8 +181,10 @@ class URIFactory
      * Create current URI object.
      *
      * @param string $routePath URI path relative to baseURL
+     *
+     * @internal Used for testing purposes only.
      */
-    private function createURIFromRoutePath(string $routePath): URI
+    public function createURIFromRoutePath(string $routePath): URI
     {
         $config = $this->appConfig;
 
@@ -211,13 +213,11 @@ class URIFactory
 
         // Based on our baseURL and allowedHostnames provided by the developer
         // and HTTP_HOST, set our current domain name, scheme.
-        $uri = new URI($baseURL . $indexPage . $routePath);
-
-        $host = $this->determineHost($baseURL);
-        $uri->setHost($host);
+        $host           = $this->determineHost($baseURL);
+        $currentBaseURL = (string) (new URI($baseURL))->setHost($host);
+        $uri            = new URI($currentBaseURL . $indexPage . $routePath);
 
         // Set URI::$baseURL
-        $currentBaseURL = (string) (new URI($baseURL))->setHost($host);
         $uri->setBaseURL($currentBaseURL);
         $uri->setRoutePath($routePath);
 

@@ -166,18 +166,7 @@ if (! function_exists('current_url')) {
     {
         $request ??= Services::request();
         /** @var CLIRequest|IncomingRequest $request */
-        $routePath  = $request->getPath();
-        $currentURI = $request->getUri();
-
-        // Append queries and fragments
-        if ($query = $currentURI->getQuery()) {
-            $query = '?' . $query;
-        }
-        if ($fragment = $currentURI->getFragment()) {
-            $fragment = '#' . $fragment;
-        }
-
-        $uri = _get_uri($routePath . $query . $fragment);
+        $uri = $request->getUri();
 
         return $returnObject ? $uri : URI::createURIString($uri->getScheme(), $uri->getAuthority(), $uri->getPath());
     }

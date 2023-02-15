@@ -11,7 +11,6 @@
 
 namespace CodeIgniter\HTTP;
 
-use BadMethodCallException;
 use CodeIgniter\HTTP\Exceptions\HTTPException;
 
 /**
@@ -28,28 +27,6 @@ class URI
      * Unreserved characters used in paths, query strings, and fragments.
      */
     public const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~';
-
-    /**
-     * Current URI string
-     *
-     * @var string
-     */
-    protected $uriString;
-
-    /**
-     * The Current baseURL.
-     */
-    private ?string $baseURL = null;
-
-    /**
-     * List of URI segments.
-     * URI Segments mean only the URI path part relative to the baseURL.
-     *
-     * Starts at 1 instead of 0
-     *
-     * @var array
-     */
-    protected $segments = [];
 
     /**
      * The URI Scheme.
@@ -89,24 +66,9 @@ class URI
     /**
      * URI path.
      *
-     * Note: The constructor of the IncomingRequest class changes the path of
-     *      the URI object held by the IncomingRequest class to a path relative
-     *      to the baseURL. If the baseURL contains subfolders, this value
-     *      will be different from the current URI path.
-     *
      * @var string
      */
     protected $path;
-
-    /**
-     * URI path relative to baseURL.
-     *
-     * If the baseURL contains sub folders, this value will be different from
-     * the current URI path.
-     *
-     * @var string
-     */
-    protected $routePath;
 
     /**
      * The name of any fragment.
@@ -492,20 +454,6 @@ class URI
     }
 
     /**
-     * Returns the URI path relative to baseURL.
-     *
-     * @return string The Route path.
-     */
-    public function getRoutePath(): string
-    {
-        if ($this->routePath === null) {
-            throw new BadMethodCallException('The $routePath is not set.');
-        }
-
-        return $this->routePath;
-    }
-
-    /**
      * Retrieve the query string
      */
     public function getQuery(array $options = []): string
@@ -545,72 +493,6 @@ class URI
     public function getFragment(): string
     {
         return $this->fragment ?? '';
-    }
-
-    /**
-     * Returns the segments of the path as an array.
-     */
-    public function getSegments(): array
-    {
-        return $this->segments;
-    }
-
-    /**
-     * Returns the value of a specific segment of the URI path.
-     *
-     * @param int    $number  Segment number
-     * @param string $default Default value
-     *
-     * @return string The value of the segment. If no segment is found,
-     *                throws InvalidArgumentError
-     */
-    public function getSegment(int $number, string $default = ''): string
-    {
-        // The segment should treat the array as 1-based for the user
-        // but we still have to deal with a zero-based array.
-        $number--;
-
-        if ($number > count($this->segments) && ! $this->silent) {
-            throw HTTPException::forURISegmentOutOfRange($number);
-        }
-
-        return $this->segments[$number] ?? $default;
-    }
-
-    /**
-     * Set the value of a specific segment of the URI path.
-     * Allows to set only existing segments or add new one.
-     *
-     * @param mixed $value (string or int)
-     *
-     * @return $this
-     */
-    public function setSegment(int $number, $value)
-    {
-        // The segment should treat the array as 1-based for the user
-        // but we still have to deal with a zero-based array.
-        $number--;
-
-        if ($number > count($this->segments) + 1) {
-            if ($this->silent) {
-                return $this;
-            }
-
-            throw HTTPException::forURISegmentOutOfRange($number);
-        }
-
-        $this->segments[$number] = $value;
-        $this->refreshPath();
-
-        return $this;
-    }
-
-    /**
-     * Returns the total number of segments.
-     */
-    public function getTotalSegments(): int
-    {
-        return count($this->segments);
     }
 
     /**
@@ -774,62 +656,6 @@ class URI
     public function setPath(string $path)
     {
         $this->path = $this->filterPath($path);
-
-        return $this;
-    }
-
-    /**
-     * Sets the route path.
-     *
-     * @return $this
-     */
-    public function setRoutePath(string $path)
-    {
-        $this->routePath = $this->filterPath($path);
-
-        $tempPath = trim($this->routePath, '/');
-
-        $this->segments = ($tempPath === '') ? [] : explode('/', $tempPath);
-
-        return $this;
-    }
-
-    /**
-     * Sets the current baseURL.
-     *
-     * @interal
-     */
-    public function setBaseURL(string $baseURL): void
-    {
-        $this->baseURL = $baseURL;
-    }
-
-    /**
-     * Returns the current baseURL.
-     *
-     * @interal
-     */
-    public function getBaseURL(): string
-    {
-        if ($this->baseURL === null) {
-            throw new BadMethodCallException('The $baseURL is not set.');
-        }
-
-        return $this->baseURL;
-    }
-
-    /**
-     * Sets the path portion of the URI based on segments.
-     *
-     * @return $this
-     */
-    public function refreshPath()
-    {
-        $this->path = $this->filterPath(implode('/', $this->segments));
-
-        $tempPath = trim($this->path, '/');
-
-        $this->segments = ($tempPath === '') ? [] : explode('/', $tempPath);
 
         return $this;
     }
@@ -1016,13 +842,6 @@ class URI
 
         if (isset($parts['pass'])) {
             $this->password = $parts['pass'];
-        }
-
-        // Populate our segments array
-        if (isset($parts['path']) && $parts['path'] !== '') {
-            $tempPath = trim($parts['path'], '/');
-
-            $this->segments = ($tempPath === '') ? [] : explode('/', $tempPath);
         }
     }
 

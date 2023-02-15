@@ -14,6 +14,7 @@ namespace CodeIgniter\Helpers\URLHelper;
 use CodeIgniter\Config\Factories;
 use CodeIgniter\Config\Services;
 use CodeIgniter\HTTP\URI;
+use CodeIgniter\HTTP\URIFactory;
 use CodeIgniter\Test\CIUnitTestCase;
 use Config\App;
 
@@ -38,15 +39,15 @@ final class CurrentUrlTest extends CIUnitTestCase
 
         Services::reset(true);
 
+        $_SERVER['REQUEST_URI'] = '/';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['HTTP_HOST']   = 'example.com';
+
         // Set a common base configuration (overriden by individual tests)
         $this->config            = new App();
         $this->config->baseURL   = 'http://example.com/';
         $this->config->indexPage = 'index.php';
         Factories::injectMock('config', 'App', $this->config);
-
-        $_SERVER['HTTP_HOST']   = 'example.com';
-        $_SERVER['REQUEST_URI'] = '/';
-        $_SERVER['SCRIPT_NAME'] = '/index.php';
     }
 
     protected function tearDown(): void
@@ -56,6 +57,19 @@ final class CurrentUrlTest extends CIUnitTestCase
         $_SERVER = [];
     }
 
+    /**
+     * Create URI and IncomingRequest
+     */
+    private function createRequest(): void
+    {
+        $factory = new URIFactory($_SERVER, $_GET, $this->config);
+        $uri     = $factory->createFromGlobals();
+        Services::injectMock('uri', $uri);
+
+        $request = Services::incomingrequest($this->config);
+        Services::injectMock('request', $request);
+    }
+
     public function testCurrentURLReturnsBasicURL()
     {
         $_SERVER['REQUEST_URI'] = '/public';
@@ -63,9 +77,7 @@ final class CurrentUrlTest extends CIUnitTestCase
 
         $this->config->baseURL = 'http://example.com/public';
 
-        // URI object are updated in IncomingRequest constructor.
-        $request = Services::incomingrequest($this->config);
-        Services::injectMock('request', $request);
+        $this->createRequest();
 
         $this->assertSame('http://example.com/public/index.php/', current_url());
     }
@@ -79,6 +91,8 @@ final class CurrentUrlTest extends CIUnitTestCase
         $this->config->baseURL          = 'http://example.com/public';
         $this->config->allowedHostnames = ['www.example.jp'];
 
+        $this->createRequest();
+
         $this->assertSame('http://www.example.jp/public/index.php/', current_url());
     }
 
@@ -91,6 +105,8 @@ final class CurrentUrlTest extends CIUnitTestCase
         $this->config->baseURL          = 'http://example.com/public';
         $this->config->allowedHostnames = ['www.example.jp'];
 
+        $this->createRequest();
+
         $this->assertSame('http://example.com/public/index.php/', current_url());
     }
 
@@ -98,6 +114,8 @@ final class CurrentUrlTest extends CIUnitTestCase
     {
         // Since we're on a CLI, we must provide our own URI
         $this->config->baseURL = 'http://example.com/public';
+
+        $this->createRequest();
 
         $url = current_url(true);
 
@@ -114,8 +132,7 @@ final class CurrentUrlTest extends CIUnitTestCase
         // Since we're on a CLI, we must provide our own URI
         Factories::injectMock('config', 'App', $this->config);
 
-        $request = Services::request($this->config);
-        Services::injectMock('request', $request);
+        $this->createRequest();
 
         $this->assertSame(site_url(uri_string()), current_url());
     }
@@ -128,16 +145,14 @@ final class CurrentUrlTest extends CIUnitTestCase
 
         // Since we're on a CLI, we must provide our own URI
         $this->config->baseURL = 'http://example.com/foo/public';
-        Factories::injectMock('config', 'App', $this->config);
 
-        $request = Services::request($this->config);
-        Services::injectMock('request', $request);
+        $this->createRequest();
 
         $this->assertSame('http://example.com/foo/public/index.php/bar', current_url());
         $this->assertSame('http://example.com/foo/public/index.php/bar?baz=quip', (string) current_url(true));
 
         $uri = current_url(true);
-        $this->assertSame('foo', $uri->getSegment(1));
+        $this->assertSame('bar', $uri->getSegment(1));
         $this->assertSame('example.com', $uri->getHost());
         $this->assertSame('http', $uri->getScheme());
     }
@@ -153,15 +168,14 @@ final class CurrentUrlTest extends CIUnitTestCase
         $this->config->baseURL = 'http://example.com:8080/foo/public';
         Factories::injectMock('config', 'App', $this->config);
 
-        $request = Services::request($this->config);
-        Services::injectMock('request', $request);
+        $this->createRequest();
 
         $this->assertSame('http://example.com:8080/foo/public/index.php/bar', current_url());
         $this->assertSame('http://example.com:8080/foo/public/index.php/bar?baz=quip', (string) current_url(true));
 
         $uri = current_url(true);
-        $this->assertSame(['foo', 'public', 'index.php', 'bar'], $uri->getSegments());
-        $this->assertSame('foo', $uri->getSegment(1));
+        $this->assertSame(['bar'], $uri->getSegments());
+        $this->assertSame('bar', $uri->getSegment(1));
         $this->assertSame('example.com', $uri->getHost());
         $this->assertSame('http', $uri->getScheme());
         $this->assertSame(8080, $uri->getPort());
