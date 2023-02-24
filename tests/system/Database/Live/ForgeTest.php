@@ -1253,7 +1253,6 @@ final class ForgeTest extends CIUnitTestCase
                 'null'       => true,
             ],
         ]);
-
         $this->forge->addKey('id', true);
         $this->forge->createTable('forge_test_three');
 
@@ -1264,7 +1263,6 @@ final class ForgeTest extends CIUnitTestCase
                 'name'       => 'altered',
                 'type'       => 'varchar',
                 'constraint' => 255,
-                'null'       => true,
             ],
         ]);
 
@@ -1272,6 +1270,15 @@ final class ForgeTest extends CIUnitTestCase
 
         $this->assertFalse($this->db->fieldExists('name', 'forge_test_three'));
         $this->assertTrue($this->db->fieldExists('altered', 'forge_test_three'));
+
+        // Check if "altered" is nullable.
+        $fields = $this->db->getFieldData('forge_test_three');
+        $field  = $fields[array_search(
+            'altered',
+            array_column($fields, 'name'),
+            true
+        )];
+        $this->assertTrue($field->nullable);
 
         $this->forge->dropTable('forge_test_three', true);
     }
