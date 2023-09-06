@@ -19,6 +19,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Class for parsing pseudo-vars
+ *
+ * @see \CodeIgniter\View\ParserTest
  */
 class Parser extends View
 {
