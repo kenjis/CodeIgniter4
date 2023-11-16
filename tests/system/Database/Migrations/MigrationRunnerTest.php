@@ -12,7 +12,6 @@
 namespace CodeIgniter\Database\Migrations;
 
 use CodeIgniter\Database\BaseConnection;
-use CodeIgniter\Database\Config;
 use CodeIgniter\Database\MigrationRunner;
 use CodeIgniter\Events\Events;
 use CodeIgniter\Exceptions\ConfigException;
@@ -476,8 +475,13 @@ final class MigrationRunnerTest extends CIUnitTestCase
     protected function resetTables($db = null): void
     {
         $forge = Database::forge($db);
+        $conn  = $forge->getConnection();
+        $conn->resetDataCache();
+//        d(config(Database::class));
 
         foreach (db_connect($db)->listTables() as $table) {
+//            echo $conn->getLastQuery() . PHP_EOL;
+//            echo $table . PHP_EOL;
             $table = str_replace('db_', '', $table);
             $forge->dropTable($table, true);
         }
