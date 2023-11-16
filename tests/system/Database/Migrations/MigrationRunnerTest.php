@@ -454,10 +454,6 @@ final class MigrationRunnerTest extends CIUnitTestCase
         $this->assertSame('2018-01-24-102302', $runner->getBatchEnd(1));
     }
 
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
     public function testMigrationUsesSameConnectionAsMigrationRunner(): void
     {
         $config = ['database' => WRITEPATH . 'runner.sqlite', 'DBDriver' => 'SQLite3', 'DBDebug' => true];
