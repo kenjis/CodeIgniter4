@@ -109,6 +109,10 @@ require_once APPPATH . 'Config/Services.php';
 
 // Initialize and register the loader with the SPL autoloader stack.
 Services::autoloader()->initialize(new Autoload(), new Modules())->register();
+
+$container = new CodeIgniter\Config\Container();
+$container->loadServices();
+
 Services::autoloader()->loadHelpers();
 
 /*

@@ -546,6 +546,7 @@ class Services extends BaseService
 
         // Inject the request object into Services::request().
         static::$instances['request'] = $request;
+        static::$container->override('request', $request);
     }
 
     /**

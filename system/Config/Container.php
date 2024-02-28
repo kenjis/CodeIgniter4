@@ -50,6 +50,7 @@ final class Container
     public function __construct()
     {
         Container::$instance = $this;
+        BaseService::setContainer($this);
     }
 
     public function loadServices()

@@ -172,12 +172,39 @@ class BaseService
      */
     protected static $services = [];
 
+    protected static ?Container $container;
+
     /**
      * A cache of the names of services classes found.
      *
      * @var list<string>
      */
     private static array $serviceNames = [];
+
+    /**
+     * Finds an entry of the container by its identifier and returns it.
+     *
+     * @param string $id Identifier of the entry to look for.
+     *
+     * @return mixed Entry.
+     */
+    public static function get(string $id): mixed
+    {
+        // Returns mock if exists
+        if (isset(static::$mocks[$id])) {
+            return static::$mocks[$id];
+        }
+
+        return static::$container->get($id);
+    }
+
+    /**
+     * @used-by Container::__construct()
+     */
+    public static function setContainer(Container $container): void
+    {
+        static::$container = $container;
+    }
 
     /**
      * Returns a shared instance of any of the class' services.
@@ -202,6 +229,10 @@ class BaseService
             $params[] = false;
 
             static::$instances[$key] = AppServices::$key(...$params);
+
+            if (! static::$container->hasInstance($key)) {
+                static::$container->set($key, static::$instances[$key]);
+            }
         }
 
         return static::$instances[$key];
@@ -298,6 +329,9 @@ class BaseService
     {
         static::$mocks     = [];
         static::$instances = [];
+
+        // Reset Container.
+        (new Container())->loadServices();
 
         if ($initAutoloader) {
             static::autoloader()->initialize(new Autoload(), new Modules());
