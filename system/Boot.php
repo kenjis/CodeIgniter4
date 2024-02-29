@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace CodeIgniter;
 
+use CodeIgniter\Autoloader\Autoloader;
 use CodeIgniter\Cache\FactoriesCache;
 use CodeIgniter\CLI\Console;
+use CodeIgniter\Config\Container;
 use CodeIgniter\Config\DotEnv;
 use CodeIgniter\Exceptions\FrameworkException;
+use Config\App;
 use Config\Autoload;
 use Config\Modules;
 use Config\Optimize;
@@ -42,17 +45,11 @@ class Boot
     public static function bootWeb(Paths $paths): int
     {
         static::loadDotEnv($paths);
-        static::defineEnvironment();
-        static::loadEnvironmentBootstrap($paths);
-        static::definePathConstants($paths);
-        if (! defined('APP_NAMESPACE')) {
-            static::loadConstants();
-        }
+        static::defineConstants($paths);
         static::loadCommonFunctions();
-        static::loadAutoloader();
-        static::setExceptionHandler();
+
+        $autoload = static::loadAutoloader();
         static::checkMissingExtensions();
-        static::initializeKint();
 
         $configCacheEnabled = class_exists(Optimize::class)
             && (new Optimize())->configCacheEnabled;
@@ -60,9 +57,14 @@ class Boot
             $factoriesCache = static::loadConfigCache();
         }
 
-        static::autoloadHelpers();
+        $container = new Container();
+        $container->loadServices();
 
-        $app = static::initializeCodeIgniter();
+        static::setExceptionHandler($container);
+        static::initializeKint($autoload);
+        static::autoloadHelpers($autoload);
+
+        $app = static::initializeCodeIgniter($container);
         static::runCodeIgniter($app);
 
         if ($configCacheEnabled) {
@@ -82,20 +84,20 @@ class Boot
     public static function bootSpark(Paths $paths): int
     {
         static::loadDotEnv($paths);
-        static::defineEnvironment();
-        static::loadEnvironmentBootstrap($paths);
-        static::definePathConstants($paths);
-        if (! defined('APP_NAMESPACE')) {
-            static::loadConstants();
-        }
+        static::defineConstants($paths);
         static::loadCommonFunctions();
-        static::loadAutoloader();
-        static::setExceptionHandler();
-        static::checkMissingExtensions();
-        static::initializeKint();
-        static::autoloadHelpers();
 
-        static::initializeCodeIgniter();
+        $autoload = static::loadAutoloader();
+        static::checkMissingExtensions();
+
+        $container = new Container();
+        $container->loadServices();
+
+        static::setExceptionHandler($container);
+        static::initializeKint($autoload);
+        static::autoloadHelpers($autoload);
+
+        static::initializeCodeIgniter($container);
         $console = static::initializeConsole();
 
         return static::runCommand($console);
@@ -110,11 +112,26 @@ class Boot
         static::loadEnvironmentBootstrap($paths, false);
         static::loadConstants();
         static::loadCommonFunctions();
-        static::loadAutoloader();
-        static::setExceptionHandler();
+
+        $autoload = static::loadAutoloader();
+
+        $container = new Container();
+        $container->loadServices();
+
+        static::setExceptionHandler($container);
         static::checkMissingExtensions();
-        static::initializeKint();
-        static::autoloadHelpers();
+        static::initializeKint($autoload);
+        static::autoloadHelpers($autoload);
+    }
+
+    public static function defineConstants(Paths $paths): void
+    {
+        static::defineEnvironment();
+        static::loadEnvironmentBootstrap($paths);
+        static::definePathConstants($paths);
+        if (! defined('APP_NAMESPACE')) {
+            static::loadConstants();
+        }
     }
 
     /**
@@ -207,7 +224,7 @@ class Boot
      * We have to load it here, though, so that the config files can use the
      * path constants.
      */
-    protected static function loadAutoloader(): void
+    public static function loadAutoloader(): Autoloader
     {
         if (! class_exists(Autoload::class, false)) {
             require_once SYSTEMPATH . 'Config/AutoloadConfig.php';
@@ -222,17 +239,20 @@ class Boot
         require_once APPPATH . 'Config/Services.php';
 
         // Initialize and register the loader with the SPL autoloader stack.
-        Services::autoloader()->initialize(new Autoload(), new Modules())->register();
+        $autoload = Services::autoloader();
+        $autoload->initialize(new Autoload(), new Modules())->register();
+
+        return $autoload;
     }
 
-    protected static function autoloadHelpers(): void
+    protected static function autoloadHelpers(Autoloader $autoload): void
     {
-        Services::autoloader()->loadHelpers();
+        $autoload->loadHelpers();
     }
 
-    protected static function setExceptionHandler(): void
+    protected static function setExceptionHandler(Container $container): void
     {
-        Services::exceptions()->initialize();
+        $container->get('exceptions')->initialize();
     }
 
     protected static function checkMissingExtensions(): void
@@ -259,9 +279,9 @@ class Boot
         }
     }
 
-    protected static function initializeKint(): void
+    protected static function initializeKint(Autoloader $autoload): void
     {
-        Services::autoloader()->initializeKint(CI_DEBUG);
+        $autoload->initializeKint(CI_DEBUG);
     }
 
     protected static function loadConfigCache(): FactoriesCache
@@ -277,9 +297,9 @@ class Boot
      * the application run, and does all the dirty work to get
      * the pieces all working together.
      */
-    protected static function initializeCodeIgniter(): CodeIgniter
+    protected static function initializeCodeIgniter(Container $container): CodeIgniter
     {
-        $app = Config\Services::codeigniter();
+        $app = $container->get('codeigniter');
         $app->initialize();
         $context = is_cli() ? 'php-cli' : 'web';
         $app->setContext($context);

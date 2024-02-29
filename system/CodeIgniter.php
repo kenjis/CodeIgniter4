@@ -661,7 +661,7 @@ class CodeIgniter
      */
     protected function getResponseObject()
     {
-        $this->response = Services::response($this->config);
+        $this->response = Services::get('response');
 
         if ($this->isWeb()) {
             $this->response->setProtocolVersion($this->request->getProtocolVersion());
