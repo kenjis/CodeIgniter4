@@ -283,7 +283,7 @@ class RouteCollection implements RouteCollectionInterface
         $this->fileLocator  = $locator;
         $this->moduleConfig = $moduleConfig;
 
-        $this->httpHost = Services::request()->getServer('HTTP_HOST');
+        $this->httpHost = Services::get('request')->getServer('HTTP_HOST');
 
         // Setup based on config file. Let routes file override.
         $this->defaultNamespace   = rtrim($routing->defaultNamespace, '\\') . '\\';
@@ -1145,7 +1145,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function view(string $from, string $view, ?array $options = null): RouteCollectionInterface
     {
-        $to = static fn (...$data) => Services::renderer()
+        $to = static fn (...$data) => Services::get('renderer')
             ->setData(['segments' => $data], 'raw')
             ->render($view, $options);
 
@@ -1258,7 +1258,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     protected function localizeRoute(string $route): string
     {
-        return strtr($route, ['{locale}' => Services::request()->getLocale()]);
+        return strtr($route, ['{locale}' => Services::get('request')->getLocale()]);
     }
 
     /**
@@ -1423,7 +1423,7 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         if ($locale === null) {
-            $locale = Services::request()->getLocale();
+            $locale = Services::get('request')->getLocale();
         }
 
         return strtr($route, ['{locale}' => $locale]);

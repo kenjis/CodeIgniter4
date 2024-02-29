@@ -96,15 +96,15 @@ trait FilterTestTrait
         // Create our own Request and Response so we can
         // use the same ones for Filters and FilterInterface
         // yet isolate them from outside influence
-        $this->request ??= clone Services::request();
-        $this->response ??= clone Services::response();
+        $this->request ??= clone Services::get('request');
+        $this->response ??= clone Services::get('response');
 
         // Create our config and Filters instance to reuse for performance
         $this->filtersConfig ??= config(FiltersConfig::class);
         $this->filters ??= new Filters($this->filtersConfig, $this->request, $this->response);
 
         if ($this->collection === null) {
-            $this->collection = Services::routes()->loadRoutes();
+            $this->collection = Services::get('routes')->loadRoutes();
         }
 
         $this->doneFilterSetUp = true;

@@ -79,7 +79,7 @@ class MigrateRollback extends BaseCommand
             // @codeCoverageIgnoreEnd
         }
 
-        $runner = Services::migrations();
+        $runner = Services::get('migrations');
 
         try {
             $batch = $params['b'] ?? CLI::getOption('b') ?? $runner->getLastBatch() - 1;

@@ -207,7 +207,7 @@ class Security implements SecurityInterface
             $this->configureSession();
         }
 
-        $this->request      = Services::request();
+        $this->request      = Services::get('request');
         $this->hashInCookie = $this->request->getCookie($this->cookieName);
 
         $this->restoreHash();
@@ -223,7 +223,7 @@ class Security implements SecurityInterface
 
     private function configureSession(): void
     {
-        $this->session = Services::session();
+        $this->session = Services::get('session');
     }
 
     private function configureCookie(CookieConfig $cookie): void
@@ -534,7 +534,7 @@ class Security implements SecurityInterface
             ]
         );
 
-        $response = Services::response();
+        $response = Services::get('response');
         $response->setCookie($this->cookie);
     }
 

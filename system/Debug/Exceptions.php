@@ -126,7 +126,7 @@ class Exceptions
 
         [$statusCode, $exitCode] = $this->determineCodes($exception);
 
-        $this->request = Services::request();
+        $this->request = Services::get('request');
 
         if ($this->config->log === true && ! in_array($statusCode, $this->config->ignoreCodes, true)) {
             $uri       = $this->request->getPath() === '' ? '/' : $this->request->getPath();
@@ -155,7 +155,7 @@ class Exceptions
             }
         }
 
-        $this->response = Services::response();
+        $this->response = Services::get('response');
 
         if (method_exists($this->config, 'handler')) {
             // Use new ExceptionHandler

@@ -42,7 +42,7 @@ final class SampleURIGenerator
 
     public function __construct(?RouteCollection $routes = null)
     {
-        $this->routes = $routes ?? Services::routes();
+        $this->routes = $routes ?? Services::get('routes');
     }
 
     /**

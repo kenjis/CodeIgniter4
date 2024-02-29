@@ -390,7 +390,7 @@ class TestResponse
         }
 
         if (is_array($test)) {
-            $test = Services::format()->getFormatter('application/json')->format($test);
+            $test = Services::get('format')->getFormatter('application/json')->format($test);
         }
 
         Assert::assertJsonStringEqualsJsonString($test, $json, 'Response does not contain matching JSON.');

@@ -38,9 +38,9 @@ class Console
         $appConfig = config(App::class);
         Services::createRequest($appConfig, true);
         // Load Routes
-        Services::routes()->loadRoutes();
+        Services::get('routes')->loadRoutes();
 
-        $runner  = Services::commands();
+        $runner  = Services::get('commands');
         $params  = array_merge(CLI::getSegments(), CLI::getOptions());
         $params  = $this->parseParamsForHelpOption($params);
         $command = array_shift($params) ?? 'list';

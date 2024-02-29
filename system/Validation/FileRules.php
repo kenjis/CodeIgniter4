@@ -40,7 +40,7 @@ class FileRules
     public function __construct(?RequestInterface $request = null)
     {
         if ($request === null) {
-            $request = Services::request();
+            $request = Services::get('request');
         }
 
         assert($request instanceof IncomingRequest || $request instanceof CLIRequest);

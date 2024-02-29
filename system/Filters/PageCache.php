@@ -31,7 +31,7 @@ class PageCache implements FilterInterface
 
     public function __construct()
     {
-        $this->pageCache = Services::responsecache();
+        $this->pageCache = Services::get('responsecache');
     }
 
     /**
@@ -45,7 +45,7 @@ class PageCache implements FilterInterface
     {
         assert($request instanceof CLIRequest || $request instanceof IncomingRequest);
 
-        $response = Services::response();
+        $response = Services::get('response');
 
         $cachedResponse = $this->pageCache->get($request, $response);
 

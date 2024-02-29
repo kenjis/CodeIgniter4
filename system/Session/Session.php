@@ -406,7 +406,7 @@ class Session implements SessionInterface
 
     private function removeOldSessionCookie(): void
     {
-        $response              = Services::response();
+        $response              = Services::get('response');
         $cookieStoreInResponse = $response->getCookieStore();
 
         if (! $cookieStoreInResponse->has($this->config->cookieName)) {
@@ -931,7 +931,7 @@ class Session implements SessionInterface
         $expiration   = $this->config->expiration === 0 ? 0 : Time::now()->getTimestamp() + $this->config->expiration;
         $this->cookie = $this->cookie->withValue(session_id())->withExpires($expiration);
 
-        $response = Services::response();
+        $response = Services::get('response');
         $response->setCookie($this->cookie);
     }
 }

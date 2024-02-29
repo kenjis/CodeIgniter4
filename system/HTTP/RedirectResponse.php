@@ -58,7 +58,7 @@ class RedirectResponse extends Response
     {
         $namedRoute = $route;
 
-        $route = Services::routes()->reverseRoute($route, ...$params);
+        $route = Services::get('routes')->reverseRoute($route, ...$params);
 
         if (! $route) {
             throw HTTPException::forInvalidRedirectRoute($namedRoute);
@@ -77,7 +77,7 @@ class RedirectResponse extends Response
      */
     public function back(?int $code = null, string $method = 'auto')
     {
-        Services::session();
+        Services::get('session');
 
         return $this->redirect(previous_url(), $method, $code);
     }
@@ -92,7 +92,7 @@ class RedirectResponse extends Response
      */
     public function withInput()
     {
-        $session = Services::session();
+        $session = Services::get('session');
         $session->setFlashdata('_ci_old_input', [
             'get'  => $_GET ?? [],
             'post' => $_POST ?? [],
@@ -114,10 +114,10 @@ class RedirectResponse extends Response
      */
     private function withErrors(): self
     {
-        $validation = Services::validation();
+        $validation = Services::get('validation');
 
         if ($validation->getErrors()) {
-            $session = Services::session();
+            $session = Services::get('session');
             $session->setFlashdata('_ci_validation_errors', $validation->getErrors());
         }
 
@@ -133,7 +133,7 @@ class RedirectResponse extends Response
      */
     public function with(string $key, $message)
     {
-        Services::session()->setFlashdata($key, $message);
+        Services::get('session')->setFlashdata($key, $message);
 
         return $this;
     }
@@ -148,7 +148,7 @@ class RedirectResponse extends Response
      */
     public function withCookies()
     {
-        $this->cookieStore = new CookieStore(Services::response()->getCookies());
+        $this->cookieStore = new CookieStore(Services::get('response')->getCookies());
 
         return $this;
     }
@@ -163,7 +163,7 @@ class RedirectResponse extends Response
      */
     public function withHeaders()
     {
-        foreach (Services::response()->headers() as $name => $value) {
+        foreach (Services::get('response')->headers() as $name => $value) {
             if ($value instanceof Header) {
                 $this->setHeader($name, $value->getValue());
             } else {

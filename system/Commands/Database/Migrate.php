@@ -68,7 +68,7 @@ class Migrate extends BaseCommand
      */
     public function run(array $params)
     {
-        $runner = Services::migrations();
+        $runner = Services::get('migrations');
         $runner->clearCliMessages();
 
         CLI::write(lang('Migrations.latest'), 'yellow');

@@ -194,7 +194,7 @@ class Filters
      */
     public static function nl2br(string $value): string
     {
-        $typography = Services::typography();
+        $typography = Services::get('typography');
 
         return $typography->nl2brExceptPre($value);
     }
@@ -205,7 +205,7 @@ class Filters
      */
     public static function prose(string $value): string
     {
-        $typography = Services::typography();
+        $typography = Services::get('typography');
 
         return $typography->autoTypography($value);
     }

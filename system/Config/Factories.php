@@ -284,7 +284,7 @@ final class Factories
         }
 
         // Have to do this the hard way...
-        $locator = Services::locator();
+        $locator = Services::get('locator');
 
         // Check if the class alias was namespaced
         if (self::isNamespaced($alias)) {

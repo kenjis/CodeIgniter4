@@ -176,7 +176,7 @@ class CodeIgniter
         $this->startTime = microtime(true);
         $this->config    = $config;
 
-        $this->pageCache = Services::responsecache();
+        $this->pageCache = Services::get('responsecache');
     }
 
     /**
@@ -286,7 +286,7 @@ class CodeIgniter
             Kint::$plugins = $config->plugins;
         }
 
-        $csp = Services::csp();
+        $csp = Services::get('csp');
         if ($csp->enabled()) {
             RichRenderer::$js_nonce  = $csp->getScriptNonce();
             RichRenderer::$css_nonce = $csp->getStyleNonce();
@@ -343,7 +343,7 @@ class CodeIgniter
 
         $this->benchmark->start('required_before_filters');
         // Start up the filters
-        $filters = Services::filters();
+        $filters = Services::get('filters');
         // Run required before filters
         $possibleResponse = $this->runRequiredBeforeFilters($filters);
 
@@ -459,7 +459,7 @@ class CodeIgniter
         $uri = $this->request->getPath();
 
         if ($this->enableFilters) {
-            $filters = Services::filters();
+            $filters = Services::get('filters');
 
             // If any filters were specified within the routes file,
             // we need to ensure it's active for the current request
@@ -515,7 +515,7 @@ class CodeIgniter
         $this->gatherOutput($cacheConfig, $returned);
 
         if ($this->enableFilters) {
-            $filters = Services::filters();
+            $filters = Services::get('filters');
             $filters->setResponse($this->response);
 
             // Run "after" filters
@@ -606,7 +606,7 @@ class CodeIgniter
             $this->startTime = microtime(true);
         }
 
-        $this->benchmark = Services::timer();
+        $this->benchmark = Services::get('timer');
         $this->benchmark->start('total_execution', $this->startTime);
         $this->benchmark->start('bootstrap');
     }
@@ -648,7 +648,7 @@ class CodeIgniter
             Services::createRequest($this->config);
         }
 
-        $this->request = Services::request();
+        $this->request = Services::get('request');
 
         $this->spoofRequestMethod();
     }
@@ -816,7 +816,7 @@ class CodeIgniter
         $this->benchmark->start('routing');
 
         if ($routes === null) {
-            $routes = Services::routes()->loadRoutes();
+            $routes = Services::get('routes')->loadRoutes();
         }
 
         // $routes is defined in Config/Routes.php
@@ -896,7 +896,7 @@ class CodeIgniter
         assert(is_string($this->controller));
 
         $class = new $this->controller();
-        $class->initController($this->request, $this->response, Services::logger());
+        $class->initController($this->request, $this->response, Services::get('logger'));
 
         $this->benchmark->stop('controller_constructor');
 

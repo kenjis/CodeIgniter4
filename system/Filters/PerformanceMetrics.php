@@ -43,7 +43,7 @@ class PerformanceMetrics implements FilterInterface
         $body = $response->getBody();
 
         if ($body !== null) {
-            $benchmark = Services::timer();
+            $benchmark = Services::get('timer');
 
             $output = str_replace(
                 [

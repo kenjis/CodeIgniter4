@@ -83,7 +83,7 @@ class MigrateStatus extends BaseCommand
      */
     public function run(array $params)
     {
-        $runner     = Services::migrations();
+        $runner     = Services::get('migrations');
         $paramGroup = $params['g'] ?? CLI::getOption('g');
 
         // Get all namespaces

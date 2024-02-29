@@ -190,7 +190,7 @@ trait ResponseTrait
         $body = $this->body;
 
         if ($this->bodyFormat !== 'json') {
-            $body = Services::format()->getFormatter('application/json')->format($body);
+            $body = Services::get('format')->getFormatter('application/json')->format($body);
         }
 
         return $body ?: null;
@@ -222,7 +222,7 @@ trait ResponseTrait
         $body = $this->body;
 
         if ($this->bodyFormat !== 'xml') {
-            $body = Services::format()->getFormatter('application/xml')->format($body);
+            $body = Services::get('format')->getFormatter('application/xml')->format($body);
         }
 
         return $body;
@@ -247,7 +247,7 @@ trait ResponseTrait
 
         // Nothing much to do for a string...
         if (! is_string($body) || $format === 'json-unencoded') {
-            $body = Services::format()->getFormatter($mime)->format($body);
+            $body = Services::get('format')->getFormatter($mime)->format($body);
         }
 
         return $body;
@@ -672,7 +672,7 @@ trait ResponseTrait
     private function dispatchCookies(): void
     {
         /** @var IncomingRequest $request */
-        $request = Services::request();
+        $request = Services::get('request');
 
         foreach ($this->cookieStore->display() as $cookie) {
             if ($cookie->isSecure() && ! $request->isSecure()) {

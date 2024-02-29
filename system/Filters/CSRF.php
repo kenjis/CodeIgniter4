@@ -52,7 +52,7 @@ class CSRF implements FilterInterface
             return;
         }
 
-        $security = Services::security();
+        $security = Services::get('security');
 
         try {
             $security->verify($request);

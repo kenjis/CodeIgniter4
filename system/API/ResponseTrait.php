@@ -307,7 +307,7 @@ trait ResponseTrait
      */
     protected function format($data = null)
     {
-        $format = Services::format();
+        $format = Services::get('format');
 
         $mime = ($this->format === null) ? $format->getConfig()->supportedResponseFormats[0]
             : "application/{$this->format}";

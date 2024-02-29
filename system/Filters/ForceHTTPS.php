@@ -43,7 +43,7 @@ class ForceHTTPS implements FilterInterface
             return;
         }
 
-        $response = Services::response();
+        $response = Services::get('response');
 
         try {
             force_https(YEAR, $request, $response);

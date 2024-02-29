@@ -77,7 +77,7 @@ class Views extends BaseCollector
 
     private function initViewer(): void
     {
-        $this->viewer ??= Services::renderer();
+        $this->viewer ??= Services::get('renderer');
     }
 
     /**

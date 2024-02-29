@@ -231,7 +231,7 @@ class BaseConfig
         }
 
         if (! static::$didDiscovery) {
-            $locator         = Services::locator();
+            $locator         = Services::get('locator');
             $registrarsFiles = $locator->search('Config/Registrar.php');
 
             foreach ($registrarsFiles as $file) {

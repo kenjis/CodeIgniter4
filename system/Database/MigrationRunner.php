@@ -415,7 +415,7 @@ class MigrationRunner
     public function findNamespaceMigrations(string $namespace): array
     {
         $migrations = [];
-        $locator    = Services::locator(true);
+        $locator    = Services::get('locator');
 
         if (! empty($this->path)) {
             helper('filesystem');
@@ -455,7 +455,7 @@ class MigrationRunner
             return false;
         }
 
-        $locator = Services::locator(true);
+        $locator = Services::get('locator');
 
         $migration = new stdClass();
 

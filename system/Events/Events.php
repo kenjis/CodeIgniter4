@@ -82,7 +82,7 @@ class Events
         $files  = [];
 
         if ($config->shouldDiscover('events')) {
-            $files = Services::locator()->search('Config/Events.php');
+            $files = Services::get('locator')->search('Config/Events.php');
         }
 
         $files = array_filter(array_map(static function (string $file) {

@@ -120,7 +120,7 @@ class Controller
      */
     protected function cachePage(int $time)
     {
-        Services::responsecache()->setTtl($time);
+        Services::get('responsecache')->setTtl($time);
     }
 
     /**
@@ -156,7 +156,7 @@ class Controller
      */
     private function setValidator($rules, array $messages): void
     {
-        $this->validator = Services::validation();
+        $this->validator = Services::get('validation');
 
         // If you replace the $rules array with the name of the group
         if (is_string($rules)) {

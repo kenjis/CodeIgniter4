@@ -71,7 +71,7 @@ if (! function_exists('cache')) {
      */
     function cache(?string $key = null)
     {
-        $cache = Services::cache();
+        $cache = Services::get('cache');
 
         // No params - return cache object
         if ($key === null) {
@@ -244,7 +244,7 @@ if (! function_exists('cookies')) {
     function cookies(array $cookies = [], bool $getGlobal = true): CookieStore
     {
         if ($getGlobal) {
-            return Services::response()->getCookieStore();
+            return Services::get('response')->getCookieStore();
         }
 
         return new CookieStore($cookies);
@@ -259,7 +259,7 @@ if (! function_exists('csrf_token')) {
      */
     function csrf_token(): string
     {
-        return Services::security()->getTokenName();
+        return Services::get('security')->getTokenName();
     }
 }
 
@@ -271,7 +271,7 @@ if (! function_exists('csrf_header')) {
      */
     function csrf_header(): string
     {
-        return Services::security()->getHeaderName();
+        return Services::get('security')->getHeaderName();
     }
 }
 
@@ -283,7 +283,7 @@ if (! function_exists('csrf_hash')) {
      */
     function csrf_hash(): string
     {
-        return Services::security()->getHash();
+        return Services::get('security')->getHash();
     }
 }
 
@@ -317,7 +317,7 @@ if (! function_exists('csp_style_nonce')) {
      */
     function csp_style_nonce(): string
     {
-        $csp = Services::csp();
+        $csp = Services::get('csp');
 
         if (! $csp->enabled()) {
             return '';
@@ -333,7 +333,7 @@ if (! function_exists('csp_script_nonce')) {
      */
     function csp_script_nonce(): string
     {
-        $csp = Services::csp();
+        $csp = Services::get('csp');
 
         if (! $csp->enabled()) {
             return '';
@@ -486,13 +486,13 @@ if (! function_exists('force_https')) {
         ?RequestInterface $request = null,
         ?ResponseInterface $response = null
     ): void {
-        $request ??= Services::request();
+        $request ??= Services::get('request');
 
         if (! $request instanceof IncomingRequest) {
             return;
         }
 
-        $response ??= Services::response();
+        $response ??= Services::get('response');
 
         if ((ENVIRONMENT !== 'testing' && (is_cli() || $request->isSecure()))
             || $request->getServer('HTTPS') === 'test'
@@ -503,7 +503,7 @@ if (! function_exists('force_https')) {
         // If the session status is active, we should regenerate
         // the session ID for safety sake.
         if (ENVIRONMENT !== 'testing' && session_status() === PHP_SESSION_ACTIVE) {
-            Services::session()->regenerate(); // @codeCoverageIgnore
+            Services::get('session')->regenerate(); // @codeCoverageIgnore
         }
 
         $uri = $request->getUri()->withScheme('https');
@@ -582,7 +582,7 @@ if (! function_exists('helper')) {
     {
         static $loaded = [];
 
-        $loader = Services::locator();
+        $loader = Services::get('locator');
 
         if (! is_array($filenames)) {
             $filenames = [$filenames];
@@ -747,7 +747,7 @@ if (! function_exists('lang')) {
      */
     function lang(string $line, array $args = [], ?string $locale = null)
     {
-        $language = Services::language();
+        $language = Services::get('language');
 
         // Get active locale
         $activeLocale = $language->getLocale();
@@ -797,7 +797,7 @@ if (! function_exists('log_message')) {
             return;
         }
 
-        Services::logger(true)->log($level, $message, $context); // @codeCoverageIgnore
+        Services::get('logger')->log($level, $message, $context); // @codeCoverageIgnore
     }
 }
 
@@ -836,7 +836,7 @@ if (! function_exists('old')) {
             session(); // @codeCoverageIgnore
         }
 
-        $request = Services::request();
+        $request = Services::get('request');
 
         $value = $request->getOldInput($key);
 
@@ -862,7 +862,7 @@ if (! function_exists('redirect')) {
      */
     function redirect(?string $route = null): RedirectResponse
     {
-        $response = Services::redirectresponse(null, true);
+        $response = Services::get('redirectresponse');
 
         if ($route !== null) {
             return $response->route($route);
@@ -934,7 +934,7 @@ if (! function_exists('request')) {
      */
     function request()
     {
-        return Services::request();
+        return Services::get('request');
     }
 }
 
@@ -944,7 +944,7 @@ if (! function_exists('response')) {
      */
     function response(): ResponseInterface
     {
-        return Services::response();
+        return Services::get('response');
     }
 }
 
@@ -965,7 +965,7 @@ if (! function_exists('route_to')) {
      */
     function route_to(string $method, ...$params)
     {
-        return Services::routes()->reverseRoute($method, ...$params);
+        return Services::get('routes')->reverseRoute($method, ...$params);
     }
 }
 
@@ -983,7 +983,7 @@ if (! function_exists('session')) {
      */
     function session(?string $val = null)
     {
-        $session = Services::session();
+        $session = Services::get('session');
 
         // Returning a single item?
         if (is_string($val)) {
@@ -1137,7 +1137,7 @@ if (! function_exists('timer')) {
      */
     function timer(?string $name = null, ?callable $callable = null)
     {
-        $timer = Services::timer();
+        $timer = Services::get('timer');
 
         if ($name === null) {
             return $timer;
@@ -1169,7 +1169,7 @@ if (! function_exists('view')) {
      */
     function view(string $name, array $data = [], array $options = []): string
     {
-        $renderer = Services::renderer();
+        $renderer = Services::get('renderer');
 
         $config   = config(View::class);
         $saveData = $config->saveData;
@@ -1194,7 +1194,7 @@ if (! function_exists('view_cell')) {
      */
     function view_cell(string $library, $params = null, int $ttl = 0, ?string $cacheName = null): string
     {
-        return Services::viewcell()
+        return Services::get('viewcell')
             ->render($library, $params, $ttl, $cacheName);
     }
 }

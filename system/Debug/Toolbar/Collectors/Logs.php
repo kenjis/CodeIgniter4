@@ -92,6 +92,6 @@ class Logs extends BaseCollector
             return $this->data;
         }
 
-        return $this->data = Services::logger(true)->logCache ?? [];
+        return $this->data = Services::get('logger')->logCache ?? [];
     }
 }

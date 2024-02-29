@@ -52,7 +52,7 @@ class Timers extends BaseCollector
     {
         $data = [];
 
-        $benchmark = Services::timer(true);
+        $benchmark = Services::get('timer');
         $rows      = $benchmark->getTimers(6);
 
         foreach ($rows as $name => $info) {

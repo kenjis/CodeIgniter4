@@ -55,8 +55,8 @@ class Routes extends BaseCollector
      */
     public function display(): array
     {
-        $rawRoutes = Services::routes(true);
-        $router    = Services::router(null, null, true);
+        $rawRoutes = Services::get('routes');
+        $router    = Services::get('router');
 
         // Get our parameters
         // Closure routes
@@ -134,7 +134,7 @@ class Routes extends BaseCollector
      */
     public function getBadgeValue(): int
     {
-        $rawRoutes = Services::routes(true);
+        $rawRoutes = Services::get('routes');
 
         return count($rawRoutes->getRoutes());
     }

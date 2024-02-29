@@ -88,13 +88,13 @@ class Routes extends BaseCommand
 
         // Set HTTP_HOST
         if ($host) {
-            $request              = Services::request();
+            $request              = Services::get('request');
             $_SERVER              = $request->getServer();
             $_SERVER['HTTP_HOST'] = $host;
             $request->setGlobal('server', $_SERVER);
         }
 
-        $collection = Services::routes()->loadRoutes();
+        $collection = Services::get('routes')->loadRoutes();
 
         // Reset HTTP_HOST
         if ($host) {

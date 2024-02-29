@@ -32,8 +32,8 @@ final class FilterFinder
 
     public function __construct(?Router $router = null, ?Filters $filters = null)
     {
-        $this->router  = $router ?? Services::router();
-        $this->filters = $filters ?? Services::filters();
+        $this->router  = $router ?? Services::get('router');
+        $this->filters = $filters ?? Services::get('filters');
     }
 
     private function getRouteFilters(string $uri): array
