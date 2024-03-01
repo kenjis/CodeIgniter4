@@ -18,9 +18,13 @@
  * How to Use:
  *   0. Copy this file to your project root folder.
  *   1. Set the $paths property of the preload class below.
- *   2. Set opcache.preload in php.ini.
+ *   2. Set opcache.preload and preload_user in php.ini.
  *     php.ini:
  *     opcache.preload=/path/to/preload.php
+ *     opcache.preload_user=www-data
+ *   3. Restart your web server.
+ *   4. Check the preload statics.
+ *     var_dump(opcache_get_status()['preload_statistics']);
  */
 
 // Load the paths config file
@@ -49,6 +53,15 @@ class preload
      */
     private array $paths = [
         [
+            'include' => __DIR__ . '/app',
+            'exclude' => [
+                // Not needed.
+                '/app/Views/',
+                // Errors occur.
+                '/app/Config/Routes.php',
+            ],
+        ],
+        [
             'include' => __DIR__ . '/vendor/codeigniter4/framework/system',
             'exclude' => [
                 // Not needed if you don't use them.
@@ -69,6 +82,10 @@ class preload
                 '/system/ThirdParty/',
             ],
         ],
+        [
+            'include' => __DIR__ . '/vendor',
+            'exclude' => [],
+        ],
     ];
 
     public function __construct()
@@ -79,7 +96,10 @@ class preload
     private function loadAutoloader()
     {
         $paths = new Config\Paths();
-        require rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstrap.php';
+        require $paths->systemDirectory . '/Boot.php';
+
+        CodeIgniter\Boot::defineConstants($paths);
+        CodeIgniter\Boot::loadAutoloader();
     }
 
     /**
