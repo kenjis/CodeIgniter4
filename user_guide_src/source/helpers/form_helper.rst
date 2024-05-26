@@ -65,7 +65,7 @@ The following functions are available:
     Creates an opening form tag with a site URL **built from your** ``Config\App::$baseURL``.
     It will optionally let you add form attributes and hidden input fields, and
     will always add the `accept-charset` attribute based on the ``$charset`` property in your
-    **app/Config/App.php`` config file.
+    **app/Config/App.php** config file.
 
     The main benefit of using this tag rather than hard coding your own HTML is that
     it permits your site to be more portable in the event your URLs ever change.
