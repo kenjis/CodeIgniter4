@@ -112,7 +112,12 @@ The following functions are available:
             <form action="http://example.com/index.php/u/sign-up" method="post" accept-charset="utf-8">
             <input type="hidden" id="my-id" name="csrf_test_name" value="964ede6e0ae8a680f7b8eab69136717d">
 
-        .. note:: To use auto-generation of CSRF field, you need to enable the :ref:`CSRF filter <enable-csrf-protection>` in **app/Config/Filters.php** file.
+        .. note:: To use auto-generation of CSRF field, you need to turn on the :ref:`CSRF filter <enable-csrf-protection>` in **app/Config/Filters.php** file.
+            In most cases the form page is requested using the GET method. Normally, CSRF protection is required
+            for POST/PUT/DELETE/PATCH requests, but even for GET requests, CSRF filters must be enabled for pages that display Forms.
+            
+            If you enable CSRF filter with [$globals] https://codeigniter4.github.io/CodeIgniter4/incoming/filters.html#globals), it will be active for all request types.
+            But if you enable CSRF filter with public array $methods = ['POST' => ['csrf']];, the hidden CSRF field will not be added in GET requests.
 
     **Adding Hidden Input Fields**
 
